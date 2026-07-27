@@ -56,7 +56,18 @@ button{font-family:inherit}
 .cbox.away .subbtn{background:#3d0b10}
 .clockbig{text-align:center;font-family:"Oswald",monospace;font-size:34px;font-weight:700;letter-spacing:2px;padding:4px 0}
 .penlist{display:flex;flex-direction:column;gap:4px}
-.penrow{display:flex;align-items:center;gap:4px;background:#2b1030;border:1px solid #5b2a63;border-radius:5px;padding:4px 6px;font-size:13px}
+.penrow{display:flex;align-items:center;gap:3px;background:#2b1030;border:1px solid #5b2a63;border-radius:5px;padding:4px 5px;font-size:13px;flex-wrap:wrap}
+.penrow .pnum{min-width:2.2em}
+.penrow .ptime{font-family:"Oswald",monospace;font-size:15px;min-width:3.1em;text-align:right}
+.penrow .pb{padding:3px 6px;font-size:11px;border-radius:4px;border:1px solid var(--line);background:#141a2b;color:var(--txt);cursor:pointer;line-height:1.2}
+.penrow .pb:hover{filter:brightness(1.4)}
+.penrow .pb.del{background:#4a1414;border-color:#7a2a2a}
+.penadd{border:1px solid var(--accent);border-radius:6px;padding:8px;background:#1a1b3a;display:flex;flex-direction:column;gap:6px}
+.penadd .row4{display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.penadd .row4 button{padding:8px 2px;font-size:13px;font-weight:700;border-radius:5px;border:1px solid var(--line);background:#e8ecf7;color:#111;cursor:pointer}
+#toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);z-index:300;display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none}
+#toast div{background:#20263ae8;border:1px solid var(--accent);color:var(--txt);padding:11px 18px;border-radius:8px;font-size:13.5px;max-width:560px;box-shadow:0 8px 24px #0008;animation:toastin .2s ease-out}
+@keyframes toastin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 .penrow b{font-family:"Oswald";font-size:15px}
 .penrow .sp{flex:1}
 .tog{width:100%;padding:9px;border-radius:6px;border:1px solid var(--line);background:#111624;color:var(--txt);cursor:pointer;font-size:13px;font-weight:600}
@@ -107,7 +118,8 @@ input[type=color]{width:40px;height:32px;padding:2px;background:#141a2b;border:1
 .sbtitle{text-align:center;font-size:1.15em;font-weight:700;padding:.18em .9em;border-radius:3px;grid-column:1/4;justify-self:center}
 .sbso{display:flex;align-items:center;justify-content:space-between;gap:.4em;padding:.14em .5em;border-radius:3px}
 .sbso .dots{display:flex;align-items:center;gap:.22em}
-.sbso .dot{width:.8em;height:.8em;border-radius:50%;background:#c9c9c9;flex:0 0 auto}
+.sbso .dot{width:.95em;height:.95em;border-radius:50%;flex:0 0 auto;display:flex;align-items:center;justify-content:center;color:#fff;font-size:1em;line-height:1}
+.sbso .dot b{font-size:.6em;font-weight:900}
 .sbso .socount{font-size:1.35em;font-weight:700;font-variant-numeric:tabular-nums}
 .stripe{background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.10) 0 8px,transparent 8px 16px)}
 
@@ -181,6 +193,7 @@ table.logtbl tr:hover td{background:#1b2236}
 <!-- =================== DISPLAY (OBS) =================== -->
 <div id="displayRoot" class="pos-tl" style="display:none"></div>
 
+<div id="toast"></div>
 <div id="setupModal"><div class="mbox">
   <h2 data-i18n="setupTitle"></h2>
   <p data-i18n="setupDesc"></p>
@@ -219,6 +232,17 @@ table.logtbl tr:hover td{background:#1b2236}
       <button class="bigbtn" data-act="sog" data-team="home" data-d="1">+1</button>
       <div class="row2"><button class="subbtn" data-act="sog" data-team="home" data-d="-1">-1</button><button class="subbtn" data-act="sogreset" data-team="home">↺ <span data-i18n="reset"></span></button></div>
       <button class="bigbtn" data-act="addpen" data-team="home" data-i18n="addPenalty"></button>
+      <div class="penadd" id="hPenAdd" style="display:none">
+        <input type="text" inputmode="numeric" data-penin="home" data-i18n-ph="penNum">
+        <div class="row4">
+          <button data-penadd="home" data-t="2:00">2:00</button>
+          <button data-penadd="home" data-t="4:00">4:00</button>
+          <button data-penadd="home" data-t="5:00">5:00</button>
+          <button data-penadd="home" data-t="10:00">10:00</button>
+        </div>
+        <div class="inline"><input type="text" data-pencustom="home" placeholder="1:30"><button class="btn sm" data-penadd="home" data-t="custom" data-i18n="penAdd"></button></div>
+        <button class="subbtn" data-pencancel="home" data-i18n="penCancel"></button>
+      </div>
       <span class="tag" data-i18n="activePenalties"></span>
       <div class="penlist" id="hPenList"></div>
       <button class="tog" data-act="en" data-team="home" id="hEnBtn" data-i18n="emptyNet"></button>
@@ -234,6 +258,17 @@ table.logtbl tr:hover td{background:#1b2236}
       <button class="bigbtn" data-act="sog" data-team="away" data-d="1">+1</button>
       <div class="row2"><button class="subbtn" data-act="sog" data-team="away" data-d="-1">-1</button><button class="subbtn" data-act="sogreset" data-team="away">↺ <span data-i18n="reset"></span></button></div>
       <button class="bigbtn" data-act="addpen" data-team="away" data-i18n="addPenalty"></button>
+      <div class="penadd" id="aPenAdd" style="display:none">
+        <input type="text" inputmode="numeric" data-penin="away" data-i18n-ph="penNum">
+        <div class="row4">
+          <button data-penadd="away" data-t="2:00">2:00</button>
+          <button data-penadd="away" data-t="4:00">4:00</button>
+          <button data-penadd="away" data-t="5:00">5:00</button>
+          <button data-penadd="away" data-t="10:00">10:00</button>
+        </div>
+        <div class="inline"><input type="text" data-pencustom="away" placeholder="1:30"><button class="btn sm" data-penadd="away" data-t="custom" data-i18n="penAdd"></button></div>
+        <button class="subbtn" data-pencancel="away" data-i18n="penCancel"></button>
+      </div>
       <span class="tag" data-i18n="activePenalties"></span>
       <div class="penlist" id="aPenList"></div>
       <button class="tog" data-act="en" data-team="away" id="aEnBtn" data-i18n="emptyNet"></button>
@@ -485,6 +520,9 @@ changeBoard:"보드 이름을 바꾸면 OBS 주소도 다시 넣어야 합니다
 boardPos:"화면 위치",boardMargin:"화면 가장자리 여백 (px)",
 posTL:"좌측 상단",posTC:"중앙 상단",posTR:"우측 상단",posBL:"좌측 하단",posBC:"중앙 하단",posBR:"우측 하단",
 obsSize:"⚠ OBS 브라우저 소스 크기는 반드시 너비 1920 / 높이 1080 으로 하세요. 그러면 위치·크기가 자동으로 딱 맞고, OBS에서 소스를 끌어 늘릴 필요가 없습니다.",
+penNum:"선수 번호",penAddTitle:"페널티 추가",penCancel:"취소",penCustom:"직접 입력",penAdd:"추가",
+soPeriodWarn:"지금 피리어드(%s)의 길이가 0:00이라 시계가 0으로 리셋됩니다. 슛아웃 모드를 끄면 이전 피리어드와 시계로 돌아갑니다.",
+soRestored:"슛아웃 모드를 껐습니다. 이전 피리어드와 시계로 되돌렸습니다.",
 myBoard:"내 보드",sumScore:"최종 스코어",sumSOG:"유효슛",sumGoals:"득점",sumPens:"페널티",sumSO:"슛아웃",sumNotes:"메모",logCleared:"기록을 지웠습니다."},
 en:{openDisplay:"Open Display",copyBug:"Copy scorebug URL",copyTicker:"Copy ticker URL",resetGame:"Reset game",
 preview:"Scoreboard preview",hide:"Hide",show:"Show",score:"Score",sog:"SOG",reset:"Reset",addPenalty:"Add penalty",
@@ -534,6 +572,9 @@ changeBoard:"Changing the board name changes your OBS URL. Continue?",
 boardPos:"Screen position",boardMargin:"Edge margin (px)",
 posTL:"Top left",posTC:"Top center",posTR:"Top right",posBL:"Bottom left",posBC:"Bottom center",posBR:"Bottom right",
 obsSize:"\u26a0 Set the OBS browser source to 1920 x 1080. Everything then lines up automatically \u2014 no need to resize the source in OBS.",
+penNum:"Player #",penAddTitle:"Add penalty",penCancel:"Cancel",penCustom:"Custom",penAdd:"Add",
+soPeriodWarn:"The current period (%s) is 0:00 long, so the clock resets to zero. Turn shootout mode off to restore the previous period and clock.",
+soRestored:"Shootout mode off — previous period and clock restored.",
 myBoard:"My board",sumScore:"Final score",sumSOG:"Shots on goal",sumGoals:"Goals",sumPens:"Penalties",sumSO:"Shootout",sumNotes:"Notes",logCleared:"Log cleared."}};
 let LANG="ko";
 const t=k=>(I18N[LANG][k]||I18N.en[k]||k);
@@ -564,6 +605,9 @@ function parseTime(str){if(typeof str==="number")return str;const p=String(str).
 function fmt(ms,tenths){if(ms<0)ms=0;const total=ms/1000;
  if(tenths&&total>0&&total<60)return (Math.floor(total*10)/10).toFixed(1);
  const m=Math.floor(total/60),s=Math.floor(total%60);return m+":"+String(s).padStart(2,"0")}
+function toast(msg,ms){const host=document.getElementById("toast");if(!host){alert(msg);return}
+ const d=document.createElement("div");d.textContent=msg;host.appendChild(d);
+ setTimeout(()=>{d.style.transition="opacity .3s";d.style.opacity="0";setTimeout(()=>d.remove(),320)},ms||3200)}
 function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
 function rid(){return Math.random().toString(36).slice(2,8)}
 
@@ -572,10 +616,10 @@ function clockLive(){const c=S.live.clock;let ms=c.ms;
  if(c.running){const el=now()-c.at;ms=S.cfg.timer.countUp?ms+el:ms-el}
  return Math.max(0,ms)}
 function clockCommit(){const c=S.live.clock;c.ms=clockLive();c.at=now()}
-function penLive(p){
- if(S.cfg.timer.penRealtime)return Math.max(0,p.ms-(now()-(p.at||now())));
- const c=S.live.clock;return Math.max(0,p.ms-(c.running?now()-c.at:0))}
-function penCommit(){["home","away"].forEach(k=>S.live[k].pen.forEach(p=>{p.ms=penLive(p);p.at=now()}))}
+function penRunning(){return S.cfg.timer.penRealtime||S.live.clock.running}
+function penLive(p){const el=penRunning()?Math.max(0,now()-(p.at||now())):0;
+ return Math.max(0,(p.ms||0)-el)}
+function penCommit(){const t=now();["home","away"].forEach(k=>S.live[k].pen.forEach(p=>{p.ms=penLive(p);p.at=t}))}
 function activePen(k){return S.live[k].pen.filter(p=>penLive(p)>0)}
 
 /* ================= sync ================= */
@@ -684,8 +728,10 @@ function soRound(){return Math.max(1,S.live.home.so.length,S.live.away.so.length
 function soHTML(k){const c=S.cfg[k],l=S.live[k];
  const n=Math.max(3,l.so.length);let dots="";
  for(let i=0;i<n;i++){const v=l.so[i];
-  const st=v==="hit"?`background:${c.fg}`:v==="miss"?`background:transparent;box-shadow:inset 0 0 0 .16em ${c.fg}`:"background:#c9c9c9";
-  dots+=`<span class="dot" style="${st}"></span>`}
+  const st=v==="hit"?"background:#1db954;box-shadow:0 0 0 2px rgba(255,255,255,.75)"
+        :v==="miss"?"background:#e0392b;box-shadow:0 0 0 2px rgba(255,255,255,.75)"
+        :"background:transparent;box-shadow:inset 0 0 0 .13em rgba(255,255,255,.5)";
+  dots+=`<span class="dot" style="${st}">${v==="hit"?"<b>\u2713</b>":v==="miss"?"<b>\u2715</b>":""}</span>`}
  const hits=l.so.filter(x=>x==="hit").length;
  return `<div class="sbso" style="background:${c.bg}cc;color:${c.fg}"><span class="dots">${dots}</span><b class="socount">${hits}</b></div>`}
 
@@ -813,7 +859,10 @@ function updateControls(){
  const sb=$("#shootoutBox");
  if(S.live.shootout){
   const line=k=>{const l=S.live[k],hits=l.so.filter(x=>x==="hit").length;
+   const dots=l.so.map(v=>`<span style="display:inline-block;width:13px;height:13px;border-radius:50%;margin-right:3px;vertical-align:-2px;
+     background:${v==="hit"?"#1db954":"#e0392b"}"></span>`).join("");
    return `<span class="tag" style="background:${S.cfg[k].bg};color:${S.cfg[k].fg}">${esc(S.cfg[k].name)} &nbsp;${hits} / ${l.so.length}</span>
+   ${dots?`<div style="padding:2px 0">${dots}</div>`:""}
    <div class="row2"><button class="subbtn" style="background:#0d4a35" data-so="hit" data-team="${k}">✔ ${t("soHit")}</button>
    <button class="subbtn" style="background:#4a1414" data-so="miss" data-team="${k}">✖ ${t("soMiss")}</button></div>
    <button class="subbtn" data-so="undo" data-team="${k}">${t("soUndo")}</button>`};
@@ -827,10 +876,19 @@ function updateControls(){
   $("#"+pre+"EnBtn").classList.toggle("on",S.live[k].en);
   $("#"+pre+"ToBtn").classList.toggle("on",S.live[k].to);
   const list=$("#"+pre+"PenList");
-  list.innerHTML=S.live[k].pen.map(p=>`<div class="penrow"><b>${esc(p.num)}</b><span class="sp"></span><b>${fmt(penLive(p))}</b>
-   <button class="btn sm" data-pen="+" data-team="${k}" data-id="${p.id}">+30</button>
-   <button class="btn sm" data-pen="-" data-team="${k}" data-id="${p.id}">-30</button>
-   <button class="btn sm" data-pen="x" data-team="${k}" data-id="${p.id}">✕</button></div>`).join("")});
+  const sig=S.live[k].pen.map(p=>p.id+":"+p.num).join(",");
+  if(list.dataset.sig!==sig){list.dataset.sig=sig;
+   list.innerHTML=S.live[k].pen.map(p=>`<div class="penrow" data-row="${p.id}">
+    <b class="pnum">${p.num?"#"+esc(p.num):"—"}</b><b class="ptime">0:00</b><span class="sp"></span>
+    <button class="pb" data-pen="p1" data-team="${k}" data-id="${p.id}">+1</button>
+    <button class="pb" data-pen="m1" data-team="${k}" data-id="${p.id}">-1</button>
+    <button class="pb" data-pen="p30" data-team="${k}" data-id="${p.id}">+30</button>
+    <button class="pb" data-pen="m30" data-team="${k}" data-id="${p.id}">-30</button>
+    <button class="pb del" data-pen="x" data-team="${k}" data-id="${p.id}">\u2715</button></div>`).join("")}
+  S.live[k].pen.forEach(p=>{const el=list.querySelector('[data-row="'+p.id+'"] .ptime');
+   if(el){const v=fmt(penLive(p));if(el.textContent!==v)el.textContent=v}});
+  const box=$("#"+pre+"PenAdd");if(box&&box.style.display!=="none"&&!S.live.clock)box.style.display="none";
+ });
 }
 function applyI18N(){$$("[data-i18n]").forEach(e=>{const k=e.getAttribute("data-i18n");if(I18N[LANG][k])e.textContent=I18N[LANG][k]});
  $$("[data-i18n-ph]").forEach(e=>{const k=e.getAttribute("data-i18n-ph");if(I18N[LANG][k])e.placeholder=I18N[LANG][k]});
@@ -929,12 +987,15 @@ function act(a,k,d,ev){
   case "addpen":addPenalty(k);return;
   case "en":S.live[k].en=!S.live[k].en;logEv(S.live[k].en?"eN":"eNoff",k,"");break;
   case "to":S.live[k].to=!S.live[k].to;if(S.live[k].to)logEv("timeout",k,"");break;
-  case "clock":{clockCommit();penCommit();S.live.clock.ms=Math.max(0,S.live.clock.ms+d*1000);break}
+  case "clock":{clockCommit();S.live.clock.ms=Math.max(0,S.live.clock.ms+d*1000);break}
   case "clockreset":{S.live.clock.running=false;const p=S.cfg.periods[S.live.pIdx];
-    S.live.clock.ms=S.cfg.timer.countUp?0:parseTime(p?p.len:"20:00");S.live.clock.at=now();break}
+    const target=S.cfg.timer.countUp?0:parseTime(p?p.len:"20:00");
+    S.live.clock.ms=target;S.live.clock.at=now();
+    if(!S.cfg.timer.countUp&&!target)toast(t("soPeriodWarn").replace("%s",p?p.n:"?"),5200);
+    break}
   case "buzzer":S.live.fx.buzz++;if(!IS_DISPLAY&&S.cfg.audio.on)playBuzz();break;
   case "horn":S.live.fx.horn++;if(!IS_DISPLAY&&S.cfg.audio.on)playHorn();break;
-  case "period":{clockCommit();penCommit();
+  case "period":{clockCommit();
     const ni=Math.max(0,Math.min(S.cfg.periods.length-1,S.live.pIdx+d));S.live.pIdx=ni;
     if(!S.live.clock.running){const p=S.cfg.periods[ni];S.live.clock.ms=S.cfg.timer.countUp?0:parseTime(p.len);S.live.clock.at=now()}
     logEv("period","",pName(ni));break}
@@ -943,26 +1004,32 @@ function act(a,k,d,ev){
   case "final":S.live.final=!S.live.final;if(S.live.final)logEv("final","",`${S.live.home.score}-${S.live.away.score}`);break;
   case "ticker":S.live.tickerOn=!S.live.tickerOn;break;
   case "replay":S.live.replay=!S.live.replay;break;
-  case "shootout":{S.live.shootout=!S.live.shootout;
-    if(S.live.shootout){const i=S.cfg.periods.findIndex(p=>/^(so|shootout|슛|승부)/i.test(p.n));
-     if(i>=0){S.live.pIdx=i;if(!S.live.clock.running){S.live.clock.ms=S.cfg.timer.countUp?0:parseTime(S.cfg.periods[i].len);S.live.clock.at=now()}}}
-    break}
+  case "shootout":{
+    const on=!S.live.shootout;
+    penCommit();clockCommit();
+    if(on){
+     S.live.prev={p:S.live.pIdx,ms:S.live.clock.ms};
+     const i=S.cfg.periods.findIndex(p=>/^(so|shootout|슛|승부)/i.test(p.n));
+     if(i>=0){S.live.pIdx=i;S.live.clock.running=false;
+      S.live.clock.ms=S.cfg.timer.countUp?0:parseTime(S.cfg.periods[i].len);S.live.clock.at=now()}
+    }else if(S.live.prev){
+     S.live.pIdx=S.live.prev.p;S.live.clock.ms=S.live.prev.ms;
+     S.live.clock.running=false;S.live.clock.at=now();S.live.prev=null;
+     toast(t("soRestored"));
+    }
+    S.live.shootout=on;break}
  }
  push()}
 
 function addPenalty(k){
- const num=prompt(LANG==="ko"?"선수 번호 (예: 11)":"Player number (e.g. 11)","");
- if(num===null)return;
- const mn=prompt(LANG==="ko"?"페널티 시간 (분:초, 예: 2:00)":"Penalty time (m:ss)","2:00");
- if(mn===null)return;
- const ms=parseTime(mn);if(!ms)return;
- penCommit();
- S.live[k].pen.push({id:rid(),num:String(num).trim(),ms,at:now()});
- logEv("pen",k,`#${String(num).trim()}  ${fmt(ms)}`);
- push()}
+ const box=$("#"+(k==="home"?"h":"a")+"PenAdd");if(!box)return;
+ const open=box.style.display==="none";
+ box.style.display=open?"flex":"none";
+ if(open)setTimeout(()=>{const i=document.querySelector('[data-penin="'+k+'"]');if(i)i.focus()},50)}
 
 function toggleClock(){
- if(S.live.clock.running){clockCommit();penCommit();S.live.clock.running=false;
+ penCommit();
+ if(S.live.clock.running){clockCommit();S.live.clock.running=false;
   if(S.cfg.logClock)logEv("stop","","")}
  else{S.live.clock.ms=clockLive();S.live.clock.at=now();S.live.clock.running=true;
   if(S.cfg.logClock)logEv("start","","")}
@@ -1032,15 +1099,15 @@ function bindBoard(){
   OPERATOR=$("#operatorName").value.trim();localStorage.setItem("htv_operator",OPERATOR);pubPresence()};
  $("#boardName").onchange=apply;$("#teamKey").onchange=apply;$("#operatorName").onchange=apply;
  $("#presetPush").onclick=()=>{
-  if(!mq||!mqReady){alert("오프라인 상태입니다.");return}
+  if(!mq||!mqReady){toast(LANG==="ko"?"오프라인 상태입니다. 잠시 후 다시 시도하세요.":"Offline — try again shortly.");return}
   const preset=JSON.parse(JSON.stringify(S.cfg));
   mq.publish(TEAMT("preset"),JSON.stringify(preset),{retain:true,qos:0});
-  alert(t("presetPushed"))};
+  toast(t("presetPushed"),5000)};
  $("#presetPull").onclick=()=>{
-  if(!teamPreset){alert(t("presetNone"));return}
+  if(!teamPreset){toast(t("presetNone"));return}
   if(!confirm(LANG==="ko"?"팀 설정으로 덮어씁니다. 지금 내 팀 이름·색상·로고 설정이 바뀝니다. 계속할까요?":"Overwrite your settings with the team preset?"))return;
   S.cfg=JSON.parse(JSON.stringify(teamPreset));LANG=S.cfg.lang||LANG;
-  applyI18N();fillSetup();pushCfg();alert(t("presetPulled"))};
+  applyI18N();fillSetup();pushCfg();toast(t("presetPulled"))};
 }
 function bindControls(){
  document.addEventListener("click",e=>{
@@ -1049,9 +1116,28 @@ function bindControls(){
   const p=e.target.closest("[data-pen]");
   if(p){penCommit();const arr=S.live[p.dataset.team].pen;const i=arr.findIndex(x=>x.id===p.dataset.id);
    if(i<0)return;
-   if(p.dataset.pen==="x")arr.splice(i,1);
-   else arr[i].ms=Math.max(0,arr[i].ms+(p.dataset.pen==="+"?30000:-30000));
+   const D={p1:1000,m1:-1000,p30:30000,m30:-30000};
+   if(p.dataset.pen==="x"){logEv("penEnd",p.dataset.team,(arr[i].num?"#"+arr[i].num:"")+" (수동 삭제)");arr.splice(i,1)}
+   else{arr[i].ms=Math.max(0,arr[i].ms+(D[p.dataset.pen]||0));if(arr[i].ms<=0)arr.splice(i,1)}
+   $("#"+(p.dataset.team==="home"?"h":"a")+"PenList").dataset.sig="";
    push();return}
+  const pa=e.target.closest("[data-penadd]");
+  if(pa){const k=pa.dataset.penadd;
+   const numEl=document.querySelector('[data-penin="'+k+'"]');
+   const cusEl=document.querySelector('[data-pencustom="'+k+'"]');
+   const tv=pa.dataset.t==="custom"?(cusEl.value||"").trim():pa.dataset.t;
+   const ms=parseTime(tv);
+   if(!ms){toast(LANG==="ko"?"시간을 2:00 처럼 입력하세요.":"Enter a time like 2:00");return}
+   penCommit();
+   const num=(numEl.value||"").trim();
+   S.live[k].pen.push({id:rid(),num,ms,at:now()});
+   logEv("pen",k,(num?"#"+num+"  ":"")+fmt(ms));
+   numEl.value="";cusEl.value="";
+   $("#"+(k==="home"?"h":"a")+"PenAdd").style.display="none";
+   $("#"+(k==="home"?"h":"a")+"PenList").dataset.sig="";
+   push();return}
+  const pc=e.target.closest("[data-pencancel]");
+  if(pc){$("#"+(pc.dataset.pencancel==="home"?"h":"a")+"PenAdd").style.display="none";return}
   const so=e.target.closest("[data-so]");
   if(so){const a=so.dataset.so,k=so.dataset.team;
    if(a==="reset"){S.live.home.so=[];S.live.away.so=[]}
@@ -1080,11 +1166,19 @@ function bindControls(){
  $("#logJson").onclick=exportJSON;
  $("#logClear").onclick=()=>{if(!S.log.length)return;
   if(!confirm(LANG==="ko"?"경기 기록을 모두 지울까요? 되돌릴 수 없습니다.":"Delete the whole game log?"))return;
-  S.log=[];saveLocal();renderLog()};
+  S.log=[];saveLocal();renderLog();toast(t("logCleared"))};
  const addNote=()=>{const v=$("#noteText").value.trim();if(!v)return;
   logEv("note","",v);$("#noteText").value=""};
  $("#noteAdd").onclick=addNote;
  $("#noteText").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();addNote()}};
+ ["home","away"].forEach(k=>{
+  const go=()=>{const b=document.querySelector('[data-penadd="'+k+'"][data-t="custom"]');
+   const cus=document.querySelector('[data-pencustom="'+k+'"]');
+   if(!cus.value.trim())cus.value="2:00";b.click()};
+  const n=document.querySelector('[data-penin="'+k+'"]'),c=document.querySelector('[data-pencustom="'+k+'"]');
+  if(n)n.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();go()}};
+  if(c)c.onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();go()}};
+ });
  $("#logClockOpt").checked=!!S.cfg.logClock;
  $("#logClockOpt").onchange=e=>{S.cfg.logClock=e.target.checked;pushCfg()};
  $("#logWrap").addEventListener("click",e=>{const b=e.target.closest("[data-logdel]");if(!b)return;
@@ -1156,10 +1250,10 @@ function bindSetup(){
   box.querySelector('[data-f="saveteam"]').onclick=()=>{const db=teamDB();
    db[S.cfg[k].name||"team"]=JSON.parse(JSON.stringify(S.cfg[k]));
    localStorage.setItem("htv_teams",JSON.stringify(db));
-   alert((LANG==="ko"?"저장했습니다: ":"Saved: ")+(S.cfg[k].name))};
+   toast((LANG==="ko"?"저장했습니다: ":"Saved: ")+(S.cfg[k].name))};
   box.querySelector('[data-f="loadteam"]').onclick=()=>{const el=box.querySelector('[data-f="teamlist"]');
    const db=teamDB();const keys=Object.keys(db);
-   if(!keys.length){alert(LANG==="ko"?"저장된 팀이 없습니다.":"No saved teams.");return}
+   if(!keys.length){toast(LANG==="ko"?"저장된 팀이 없습니다.":"No saved teams.");return}
    el.style.display=el.style.display==="none"?"block":"none";
    el.innerHTML=keys.map(n=>`<div class="teamchip"><img src="${db[n].logo||""}"><span class="sp">${esc(n)}</span>
      <button class="btn sm" data-tload="${esc(n)}" data-side="${k}">↓</button>
@@ -1196,13 +1290,13 @@ function bindSetup(){
  cb("#optPeriod",v=>S.cfg.board.showPeriod=v);cb("#optSOG",v=>S.cfg.board.showSOG=v);
  cb("#optRec",v=>S.cfg.board.showRec=v);cb("#optPenTop",v=>S.cfg.board.penTop=v);
  cb("#optPP",v=>S.cfg.board.pp=v);cb("#optGoalH",v=>S.cfg.board.goalH=v);cb("#optGoalA",v=>S.cfg.board.goalA=v);cb("#optReplayDim",v=>S.cfg.board.replayDim=v);
- cb("#showTimer",v=>S.cfg.timer.show=v);cb("#autoBuzz",v=>S.cfg.timer.autoBuzz=v);cb("#penFreeze",v=>S.cfg.timer.penRealtime=v);
+ cb("#showTimer",v=>S.cfg.timer.show=v);cb("#autoBuzz",v=>S.cfg.timer.autoBuzz=v);$("#penFreeze").onchange=e=>{penCommit();S.cfg.timer.penRealtime=e.target.checked;penCommit();pubLive();pushCfg()};
  $("#countUp").onchange=e=>{clockCommit();S.cfg.timer.countUp=e.target.checked;
   S.live.clock.ms=e.target.checked?0:parseTime(S.cfg.periods[S.live.pIdx].len);S.live.clock.at=now();pubLive();pushCfg()};
  cb("#audioOn",v=>S.cfg.audio.on=v);cb("#hornOn",v=>S.cfg.audio.horn=v);
  $("#tickerSpeed").oninput=e=>{S.cfg.ticker.speed=Math.max(5,parseInt(e.target.value||25));pushCfg()};
  $("#hornFile").onchange=e=>{const f=e.target.files[0];if(!f)return;
-  if(f.size>1100000){alert(LANG==="ko"?"1MB 이하 파일만 가능합니다.":"File must be under 1MB");return}
+  if(f.size>1100000){toast(LANG==="ko"?"1MB 이하 파일만 가능합니다.":"File must be under 1MB");return}
   const r=new FileReader();r.onload=()=>{S.cfg.audio.data=r.result;pushCfg()};r.readAsDataURL(f)};
  $("#hornDel").onclick=()=>{S.cfg.audio.data=null;hornAudio=null;pushCfg()};
  $("#addPeriod").onclick=()=>{S.cfg.periods.push({n:"P"+(S.cfg.periods.length+1),len:"20:00"});renderPeriods();pushCfg()};
