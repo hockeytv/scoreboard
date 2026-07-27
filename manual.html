@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>하키티비 스코어보드 사용 매뉴얼</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&family=Black+Han+Sans&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0f1320;--card:#181d2e;--line:#2c3450;--txt:#e9edf8;--mut:#98a2c0;--acc:#6d5cf7;--ok:#18b884;--warn:#e0b020;--bad:#e0553f}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--txt);font-family:"Noto Sans KR",system-ui,sans-serif;line-height:1.75;font-size:16px}
+.wrap{max-width:820px;margin:0 auto;padding:0 20px 80px}
+header{background:linear-gradient(135deg,#131a33,#2a1f5c);padding:44px 20px 38px;text-align:center;border-bottom:3px solid var(--acc)}
+header h1{font-family:"Black Han Sans","Noto Sans KR",sans-serif;font-size:32px;margin:0 0 8px;letter-spacing:-.01em}
+header p{margin:0;color:#b9c0da;font-size:15px}
+h2{font-size:22px;margin:52px 0 14px;padding-bottom:10px;border-bottom:2px solid var(--line);display:flex;align-items:center;gap:12px}
+h2 .n{background:var(--acc);color:#fff;width:34px;height:34px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-size:17px;font-weight:900;flex:0 0 auto}
+h3{font-size:17px;margin:26px 0 8px;color:#cdd5f0}
+p{margin:10px 0}
+a{color:#9d8fff}
+code{background:#232a42;padding:2px 7px;border-radius:5px;font-size:.92em;font-family:ui-monospace,Menlo,monospace;word-break:break-all}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:16px 0}
+.url{background:#232a42;border:1px solid var(--acc);border-radius:10px;padding:14px 16px;margin:12px 0;font-family:ui-monospace,Menlo,monospace;font-size:15px;word-break:break-all;color:#c9c2ff}
+ol,ul{padding-left:22px;margin:10px 0}
+li{margin:7px 0}
+ol.steps{counter-reset:s;list-style:none;padding-left:0}
+ol.steps>li{counter-increment:s;position:relative;padding-left:44px;margin:16px 0}
+ol.steps>li:before{content:counter(s);position:absolute;left:0;top:1px;width:30px;height:30px;border-radius:50%;background:var(--acc);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:15px}
+th,td{border:1px solid var(--line);padding:10px 12px;text-align:left;vertical-align:top}
+th{background:#212841;color:#c3cbe8;font-weight:700;white-space:nowrap}
+.box{border-radius:10px;padding:14px 18px;margin:16px 0;border-left:5px solid}
+.box.warn{background:#3a2e12;border-color:var(--warn)}
+.box.bad{background:#3a1a17;border-color:var(--bad)}
+.box.ok{background:#0f2f26;border-color:var(--ok)}
+.box.tip{background:#1c1b3d;border-color:var(--acc)}
+.box b{display:block;margin-bottom:4px}
+kbd{background:#2c3450;border:1px solid #46507a;border-bottom-width:3px;border-radius:6px;padding:2px 9px;font-size:.88em;font-family:inherit;font-weight:700}
+.toc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 22px;margin:28px 0}
+.toc ol{margin:6px 0;padding-left:20px}
+.toc a{text-decoration:none}
+.toc a:hover{text-decoration:underline}
+footer{text-align:center;color:var(--mut);font-size:13px;padding:36px 20px;border-top:1px solid var(--line);margin-top:50px}
+.big{font-size:19px;font-weight:700}
+@media print{body{background:#fff;color:#000}.card,.toc{background:#fff;border-color:#bbb}header{background:#eee;color:#000}h1,header p{color:#000}code,.url{background:#f2f2f2;color:#000}}
+</style>
+</head>
+<body>
+<header>
+  <h1>하키티비 스코어보드 사용 매뉴얼</h1>
+  <p>OBS 중계용 아이스하키 스코어보드 · 중계 담당자용</p>
+</header>
+
+<div class="wrap">
+
+<div class="toc">
+  <b>목차</b>
+  <ol>
+    <li><a href="#s1">사이트 접속</a></li>
+    <li><a href="#s2">처음 한 번만 — 내 보드 만들기</a></li>
+    <li><a href="#s3">OBS에 연결하기</a></li>
+    <li><a href="#s4">경기 시작 전 준비</a></li>
+    <li><a href="#s5">경기 중 조작</a></li>
+    <li><a href="#s6">페널티 넣고 빼기</a></li>
+    <li><a href="#s7">승부치기(슛아웃)</a></li>
+    <li><a href="#s8">경기가 끝나면</a></li>
+    <li><a href="#s9">문제가 생겼을 때</a></li>
+    <li><a href="#s10">꼭 지켜야 할 것</a></li>
+  </ol>
+</div>
+
+<h2 id="s1"><span class="n">1</span> 사이트 접속</h2>
+<p>중계에 쓸 PC의 <b>크롬(Chrome)</b>으로 아래 주소에 접속합니다. 즐겨찾기에 등록해 두세요.</p>
+<div class="url">https://hockeytv.github.io/scoreboard/</div>
+<p>설치할 프로그램은 없습니다. 이 주소로 접속한 화면이 <b>점수를 조작하는 화면</b>입니다.</p>
+<div class="box tip"><b>💡 두 개의 화면이 있습니다</b>
+  <b style="display:inline">조작 화면</b>은 내가 보면서 버튼을 누르는 곳이고, <b>스코어버그</b>는 시청자에게 보이는 그래픽입니다. 조작 화면에서 누르면 스코어버그가 실시간으로 바뀝니다.
+</div>
+
+<h2 id="s2"><span class="n">2</span> 처음 한 번만 — 내 보드 만들기</h2>
+<p>처음 접속하면 설정 창이 뜹니다. <b>이 설정은 한 번만 하면 됩니다.</b></p>
+<table>
+  <tr><th>팀 공용 키</th><td>하키티비 <b>전 직원이 똑같은 값</b>을 씁니다. 관리자에게 받아서 그대로 붙여넣으세요. 자동으로 채워진 값이 있어도 <b>반드시 받은 값으로 바꿔야</b> 합니다.</td></tr>
+  <tr><th>내 보드 이름</th><td>사람마다 <b>다르게</b> 정합니다. 영문·숫자로 짧게. 예: <code>rink1</code>, <code>kim</code>, <code>u18</code></td></tr>
+  <tr><th>담당자 이름</th><td>선택 사항. 팀 현황판에 표시됩니다.</td></tr>
+</table>
+<p><b>시작하기</b>를 누르면 내 전용 주소가 자동으로 만들어집니다. 보드 이름만 다르면 다른 직원과 점수가 절대 섞이지 않습니다.</p>
+<div class="box bad"><b>⚠ 보드 이름이 겹치면</b>
+  화면 중간 <b>우리 팀 현황</b>에 빨간 경고가 뜹니다. 그대로 두면 두 사람의 점수가 서로 덮어써지니, 즉시 설정에서 다른 이름으로 바꾸세요.
+</div>
+<p>나중에 바꾸려면 <b>설정 → 사운드·티커·OBS 주소</b> 칸에서 수정할 수 있습니다. (바꾸면 OBS 주소도 다시 넣어야 합니다)</p>
+
+<h2 id="s3"><span class="n">3</span> OBS에 연결하기</h2>
+<ol class="steps">
+  <li>조작 화면 맨 위의 <b>📋 OBS 스코어버그 주소 복사</b>를 클릭합니다.</li>
+  <li>OBS에서 소스 <b>＋</b> → <b>브라우저</b>를 선택하고 이름을 정합니다.</li>
+  <li><b>URL</b> 칸에 복사한 주소를 붙여넣습니다.</li>
+  <li><span class="big">너비 <code>1920</code> / 높이 <code>1080</code></span> 으로 입력합니다. <b>이 값이 가장 중요합니다.</b></li>
+  <li>아래 두 항목은 <b>체크를 해제</b>합니다.
+    <ul><li>☐ 보이지 않을 때 소스 종료</li><li>☐ 장면이 활성화될 때 브라우저 새로 고침</li></ul>
+  </li>
+  <li>골혼·부저 소리를 방송에 내보내려면 <b>☑ OBS를 통해 오디오 제어</b>를 체크합니다.</li>
+  <li>확인을 누르고, 소스를 <b>우클릭 → 변환 → 변환 초기화</b>를 한 번 해줍니다.</li>
+</ol>
+<div class="box warn"><b>⚠ OBS에서 마우스로 끌어서 크기를 조절하지 마세요</b>
+  스코어보드는 1920×1080 화면 전체를 기준으로 위치가 계산됩니다. 소스를 1920×1080으로 두면 저절로 딱 맞습니다. 끌어서 늘리면 화질만 흐려집니다.<br>
+  <b style="display:inline">위치·크기는 조작 화면에서</b> 바꾸세요 → 설정 → 보드 레이아웃(화면 위치·여백), 보드 외형(글자 크기).
+</div>
+<p>배경은 이미 투명하게 나오므로 사용자 정의 CSS는 건드릴 필요가 없습니다. 하단 스크롤 자막을 따로 쓰려면 <b>📋 OBS 티커 주소 복사</b>로 브라우저 소스를 하나 더 만드세요.</p>
+
+<h2 id="s4"><span class="n">4</span> 경기 시작 전 준비</h2>
+<p>조작 화면 아래 <b>설정</b> 영역에서 준비합니다. 위쪽 <b>미리보기</b>가 실제 방송 화면과 똑같이 보이니, 미리보기를 보면서 맞추면 됩니다.</p>
+<h3>팀 정보</h3>
+<ul>
+  <li><b>팀 이름 / 전적</b> 입력 (전적은 비워도 됩니다)</li>
+  <li><b>배경색 · 글자색</b> — 팀 유니폼 색에 맞추면 보기 좋습니다</li>
+  <li><b>팀 로고</b> — 이미지 파일 선택. 크기는 <code>−</code> <code>+</code>로 조절</li>
+  <li>자주 쓰는 팀은 <b>현재 팀 저장</b> 해두면 다음 경기에 <b>저장된 팀 불러오기</b>로 한 번에 불러옵니다</li>
+  <li>홈·어웨이가 반대면 <b>홈/어웨이 바꾸기</b> 한 번</li>
+</ul>
+<h3>경기 규칙</h3>
+<ul>
+  <li><b>타이머 설정 → 피리어드 구성</b>에서 이름과 길이를 대회에 맞게 수정합니다 (예: 15분 3피리어드)</li>
+  <li>피리어드를 추가·삭제할 수 있습니다</li>
+</ul>
+<h3>화면 꾸미기</h3>
+<ul>
+  <li><b>보드 외형 → 제목 표시</b>를 켜고 대회명을 입력하면 스코어보드 위에 표시됩니다</li>
+  <li><b>글자 크기</b> <code>+</code> <code>−</code> 로 스코어보드 전체 크기 조절</li>
+  <li><b>화면 위치</b>: 좌측 상단 / 중앙 상단 / 우측 상단 / 좌측 하단 / 중앙 하단 / 우측 하단</li>
+</ul>
+<div class="box ok"><b>✔ 관리자가 설정을 배포했다면</b>
+  <b style="display:inline">설정 → ⬇ 팀 설정 가져오기</b> 를 한 번 누르면 글꼴·색상·피리어드가 팀 표준으로 한 번에 맞춰집니다. 점수와 경기 기록은 각자 따로 유지됩니다.
+</div>
+
+<h2 id="s5"><span class="n">5</span> 경기 중 조작</h2>
+<table>
+  <tr><th>득점</th><td>해당 팀의 큰 <b>+1</b> 버튼. 잘못 눌렀으면 <b>-1</b><br>득점하면 골 애니메이션과 골혼이 자동 재생됩니다</td></tr>
+  <tr><th>유효슛(SOG)</th><td>아래쪽 <b>+1</b> / <b>-1</b></td></tr>
+  <tr><th>시계</th><td><b>시작</b> / <b>일시정지</b> 버튼, 또는 <kbd>Space</kbd><br>시간이 틀리면 <b>+1 / -1 / +60 / -60</b> 초 단위로 보정</td></tr>
+  <tr><th>피리어드</th><td>경기 상태 칸의 <b>+1</b> / <b>-1</b><br>시계가 멈춰 있을 때 바꾸면 그 피리어드 시간으로 자동 설정됩니다</td></tr>
+  <tr><th>타임아웃</th><td>해당 팀의 <b>타임아웃</b> 버튼 (다시 누르면 꺼짐)</td></tr>
+  <tr><th>엠티넷</th><td>골리를 뺐을 때 <b>엠티넷</b> 버튼 (다시 누르면 꺼짐)</td></tr>
+  <tr><th>부저 · 골혼</th><td>타이머 칸의 <b>부저</b> / <b>골혼 재생</b> 버튼으로 수동 재생</td></tr>
+  <tr><th>경기 종료</th><td><b>경기 종료 표시</b>를 켜면 시계 자리에 "경기 종료"가 표시됩니다</td></tr>
+  <tr><th>하단 자막</th><td><b>티커 문구</b>에 내용을 적고 <b>하단 티커 표시</b>를 켜면 흘러갑니다</td></tr>
+  <tr><th>리플레이</th><td>다시보기를 틀 때 <kbd>R</kbd> 또는 <b>🔴 리플레이 표시</b><br>빨간 "리플레이" 배지가 뜨고 점수판이 흐려집니다. 끝나면 다시 눌러 끄세요</td></tr>
+</table>
+<h3>단축키</h3>
+<p><kbd>Space</kbd> 시계 시작/정지 &nbsp;·&nbsp; <kbd>Q</kbd> 홈 득점 +1 &nbsp;·&nbsp; <kbd>W</kbd> 어웨이 득점 +1 &nbsp;·&nbsp; <kbd>R</kbd> 리플레이 표시</p>
+<div class="box tip"><b>💡 메모를 남겨두세요</b>
+  <b style="display:inline">경기 기록</b> 칸의 메모 입력란에 "골리 교체", "비디오 판독" 같은 내용을 적고 <kbd>Enter</kbd>를 누르면 그 시점 시계와 함께 저장됩니다. 나중에 하이라이트 편집할 때 유용합니다.
+</div>
+
+<h2 id="s6"><span class="n">6</span> 페널티 넣고 빼기</h2>
+<h3>추가</h3>
+<ol class="steps">
+  <li>해당 팀의 <b>페널티 추가</b>를 누릅니다. (팝업창은 뜨지 않습니다)</li>
+  <li>선수 번호를 입력합니다. (몰라도 비워두고 진행 가능)</li>
+  <li><b>2:00 / 4:00 / 5:00 / 10:00</b> 중 하나를 클릭합니다.<br>다른 시간은 아래 칸에 <code>1:30</code> 처럼 입력하고 <b>추가</b>를 누르세요.</li>
+</ol>
+<h3>수정 · 해제</h3>
+<p>추가된 줄에 버튼이 있습니다.</p>
+<table>
+  <tr><th>+1 / -1</th><td>1초씩 조정</td></tr>
+  <tr><th>+30 / -30</th><td>30초씩 조정</td></tr>
+  <tr><th>✕</th><td>즉시 해제 (상대 팀이 득점했을 때 등)</td></tr>
+</table>
+<ul>
+  <li>페널티는 <b>게임시계가 돌 때만</b> 줄어듭니다. 시계를 멈추면 같이 멈춥니다.</li>
+  <li>시간이 0이 되면 <b>자동으로 사라집니다.</b></li>
+  <li>한 팀에 여러 개를 동시에 걸 수 있습니다.</li>
+</ul>
+<p>개별 페널티 대신 "파워플레이 2:00" 형태로 보이게 하려면 <b>설정 → 보드 외형 → 개별 페널티 대신 '파워플레이' 표시</b>를 켜세요.</p>
+
+<h2 id="s7"><span class="n">7</span> 승부치기(슛아웃)</h2>
+<ol class="steps">
+  <li>경기 상태 칸의 <b>승부치기(슛아웃) 모드</b>를 켭니다. 피리어드가 자동으로 <b>SO</b>로 바뀝니다.</li>
+  <li>선수가 슛을 쏠 때마다 해당 팀의 <b>✔ 성공</b> 또는 <b>✖ 실패</b>를 누릅니다.</li>
+  <li>화면에는 성공 🟢, 실패 🔴, 아직 안 쏨 ⚪ 으로 표시되고 라운드는 자동 계산됩니다.</li>
+  <li>잘못 눌렀으면 <b>↩ 되돌리기</b>, 처음부터 다시 하려면 <b>슛아웃 초기화</b>.</li>
+  <li>승부치기가 끝나면 승리 팀 점수를 <b>+1</b> 해주세요.</li>
+</ol>
+<div class="box ok"><b>✔ 슛아웃 모드를 끄면</b>
+  직전 피리어드와 시계가 자동으로 되돌아옵니다. 따로 초기화할 필요 없습니다.
+</div>
+
+<h2 id="s8"><span class="n">8</span> 경기가 끝나면</h2>
+<div class="box bad"><b>⚠ 순서를 꼭 지키세요 — 내보내기 먼저, 초기화는 나중에</b>
+  초기화하면서 기록을 지우면 되돌릴 수 없습니다.
+</div>
+<p>골·페널티·타임아웃·피리어드·슛아웃이 <b>자동으로 기록</b>되어 있습니다. <b>경기 기록</b> 칸에서 내보내세요.</p>
+<table>
+  <tr><th>⬇ 경기 요약 (txt)</th><td>최종 스코어·득점·페널티가 정리된 요약본. <b>유튜브 설명란에 그대로 붙여넣기</b> 좋습니다</td></tr>
+  <tr><th>⬇ CSV (엑셀)</th><td>엑셀·구글 시트에서 바로 열립니다. 기록 정리·통계용</td></tr>
+  <tr><th>⬇ JSON</th><td>다른 프로그램에서 불러 쓸 때</td></tr>
+</table>
+<p>내보낸 뒤 맨 위 <b>↺ 경기 초기화</b>를 누르면 점수·시계·페널티가 초기화됩니다. "이전 경기 기록도 지울까요?"를 한 번 더 묻습니다.</p>
+<ul>
+  <li><b>확인</b> → 기록까지 비우고 새 경기 시작</li>
+  <li><b>취소</b> → 점수만 초기화하고 기록은 이어서 남김 (하루에 여러 경기를 한 파일로 남길 때)</li>
+</ul>
+
+<h2 id="s9"><span class="n">9</span> 문제가 생겼을 때</h2>
+<table>
+  <tr><th>OBS에 아무것도 안 보임</th><td>주소 끝에 <code>?view=bug&amp;room=...</code> 부분까지 다 붙여넣었는지 확인. 소스 크기가 1920×1080인지 확인</td></tr>
+  <tr><th>OBS 화면이 안 바뀜</th><td>조작 화면 오른쪽 위가 <b>🟢</b>인지 확인. <b>🟠</b>면 인터넷 연결 확인 후 새로고침. OBS 소스는 속성 창의 <b>새로고침</b> 버튼</td></tr>
+  <tr><th>스코어보드가 잘림</th><td>OBS 소스 크기를 1920×1080으로. 그 뒤 소스 우클릭 → 변환 → 변환 초기화</td></tr>
+  <tr><th>내가 누른 게 다른 사람 화면에 나옴</th><td>보드 이름이 겹친 것입니다. 설정에서 다른 이름으로 변경</td></tr>
+  <tr><th>소리가 안 남</th><td>OBS 브라우저 소스 속성에서 <b>OBS를 통해 오디오 제어</b> 체크</td></tr>
+  <tr><th>글꼴이 이상함</th><td>인터넷 연결 필요(웹폰트 사용). 새로고침 <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> (맥: <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd>)</td></tr>
+  <tr><th>화면이 예전 버전 같음</th><td>강력 새로고침 <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd></td></tr>
+</table>
+
+<h2 id="s10"><span class="n">10</span> 꼭 지켜야 할 것</h2>
+<div class="box bad"><b>1. 팀 공용 키는 외부에 공개하지 마세요</b>
+  이 키를 아는 사람은 우리 스코어보드를 볼 수 있습니다. 카톡 단톡방·유튜브 댓글·화면 공유 등에 노출되지 않게 주의하세요.
+</div>
+<div class="box warn"><b>2. 보드 이름은 사람마다 다르게</b>
+  같은 이름을 쓰면 두 사람의 점수가 서로 덮어써집니다. 빨간 경고가 뜨면 즉시 바꾸세요.
+</div>
+<div class="box warn"><b>3. 경기 기록은 내보낸 뒤에 초기화</b>
+  기록은 이 PC의 브라우저에만 저장됩니다. 지우면 복구할 수 없습니다.
+</div>
+<div class="box tip"><b>4. 방송 전 5분 점검</b>
+  <ul style="margin:6px 0 0">
+    <li>조작 화면 오른쪽 위 <b>🟢</b> 확인</li>
+    <li>OBS 브라우저 소스 <b>1920×1080</b> 확인</li>
+    <li>팀 이름·색상·로고 확인</li>
+    <li>피리어드 시간 확인</li>
+    <li>득점 <b>+1</b> 눌러 스코어버그가 바뀌는지 확인 후 <b>-1</b>로 되돌리기</li>
+  </ul>
+</div>
+
+<footer>
+  하키티비 스코어보드 · 문의는 관리자에게<br>
+  조작 화면: <a href="https://hockeytv.github.io/scoreboard/">hockeytv.github.io/scoreboard</a>
+</footer>
+</div>
+</body>
+</html>
