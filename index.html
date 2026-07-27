@@ -139,6 +139,21 @@ input[type=color]{width:40px;height:32px;padding:2px;background:#141a2b;border:1
 .tickerbar .tk{display:inline-block;padding-left:100%;animation:tkscroll linear infinite}
 @keyframes tkscroll{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
 
+/* first-run modal + team panel */
+#setupModal{position:fixed;inset:0;background:#0b0e17ee;z-index:200;display:none;align-items:center;justify-content:center;padding:20px}
+#setupModal .mbox{background:var(--panel);border:1px solid var(--line);border-radius:12px;max-width:520px;width:100%;padding:22px}
+#setupModal h2{margin:0 0 6px;font-size:19px}
+#setupModal p{margin:0 0 14px;font-size:13px;color:var(--muted);line-height:1.6}
+.teamgrid{display:flex;flex-direction:column;gap:6px}
+.brow{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:#141a2b;font-size:13px}
+.brow.me{border-color:var(--accent);background:#1b1b3a}
+.brow.dup{border-color:#e0553f;background:#3a1a17}
+.blive{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.blive.idle{background:#6b7590}
+.bname{font-weight:700}
+.bmeta{color:var(--muted);font-size:12px}
+.bscore{font-family:"Oswald",monospace;font-weight:700;font-size:16px;white-space:nowrap}
+.warnbar{background:#3a1a17;border:1px solid #e0553f;color:#ffb3a7;border-radius:8px;padding:9px 12px;font-size:13px;margin-bottom:10px}
 /* game log */
 .logwrap{max-height:300px;overflow:auto;border:1px solid var(--line);border-radius:6px;background:#141a2b}
 table.logtbl{width:100%;border-collapse:collapse;font-size:12.5px}
@@ -162,6 +177,17 @@ table.logtbl tr:hover td{background:#1b2236}
 
 <!-- =================== DISPLAY (OBS) =================== -->
 <div id="displayRoot" class="pos-tl" style="display:none"></div>
+
+<div id="setupModal"><div class="mbox">
+  <h2 data-i18n="setupTitle"></h2>
+  <p data-i18n="setupDesc"></p>
+  <label class="f" data-i18n="teamKey"></label><input type="text" id="mTeamKey">
+  <div class="hint" data-i18n="teamKeyHint"></div>
+  <label class="f" data-i18n="boardName"></label><input type="text" id="mBoard" placeholder="rink1">
+  <div class="hint" data-i18n="boardNameHint"></div>
+  <label class="f" data-i18n="operator"></label><input type="text" id="mOp" placeholder="김하키">
+  <button class="btn pri wide" id="mSave" style="margin-top:16px;padding:11px" data-i18n="startBtn"></button>
+</div></div>
 
 <!-- =================== CONTROL PANEL =================== -->
 <div id="controlRoot">
@@ -245,6 +271,11 @@ table.logtbl tr:hover td{background:#1b2236}
       <div id="shootoutBox" style="display:none"></div>
     </div></div>
   </div>
+
+  <div class="section"><h3><span data-i18n="teamStatus"></span><span id="myBoardTag" class="hint"></span></h3><div class="body">
+    <div id="dupWarn" class="warnbar" style="display:none" data-i18n="dupWarn"></div>
+    <div class="teamgrid" id="teamGrid"></div>
+  </div></div>
 
   <div class="section"><h3><span data-i18n="gameLog"></span><span><button class="btn sm" id="logCsv" data-i18n="exportCsv"></button>
     <button class="btn sm" id="logTxt" data-i18n="exportTxt"></button>
@@ -369,9 +400,16 @@ table.logtbl tr:hover td{background:#1b2236}
         <label class="f" data-i18n="obsUrls"></label>
         <div class="copybox"><input type="text" id="urlBug" readonly><button class="btn sm" data-copy="urlBug">복사</button></div>
         <div class="copybox"><input type="text" id="urlTicker" readonly><button class="btn sm" data-copy="urlTicker">복사</button></div>
+        <label class="f" data-i18n="boardName"></label>
+        <div class="inline"><input type="text" id="boardName"><input type="text" id="operatorName" placeholder="담당자"></div>
+        <label class="f" data-i18n="teamKey"></label>
+        <input type="text" id="teamKey">
+        <div class="hint" data-i18n="boardNameHint"></div>
         <label class="f" data-i18n="roomCode"></label>
-        <div class="inline"><input type="text" id="roomCode"><button class="btn sm" id="roomNew" data-i18n="newRoom"></button></div>
+        <div class="inline"><input type="text" id="roomCode" readonly></div>
         <div class="hint" data-i18n="roomHint"></div>
+        <div class="row2" style="margin-top:8px"><button class="btn sm" id="presetPush" data-i18n="pushPreset"></button><button class="btn sm" id="presetPull" data-i18n="pullPreset"></button></div>
+        <div class="hint" data-i18n="presetHint"></div>
         <div style="margin-top:8px" class="row2"><button class="btn sm" id="btnExport" data-i18n="exportCfg"></button><button class="btn sm" id="btnImport" data-i18n="importCfg"></button></div>
         <input type="file" accept="application/json" id="importFile" style="display:none">
       </div>
@@ -418,7 +456,20 @@ noLog:"아직 기록이 없습니다. 점수·페널티를 입력하면 자동�
 evGoal:"골",evGoalCancel:"골 취소",evPen:"페널티",evPenEnd:"페널티 종료",evPeriod:"피리어드",evFinal:"경기 종료",
 evTimeout:"타임아웃",evEN:"엠티넷",evENoff:"엠티넷 해제",evSoHit:"슛아웃 성공",evSoMiss:"슛아웃 실패",
 evNote:"메모",evStart:"시계 시작",evStop:"시계 정지",evReset:"경기 초기화",
-sumScore:"최종 스코어",sumSOG:"유효슛",sumGoals:"득점",sumPens:"페널티",sumSO:"슛아웃",sumNotes:"메모",logCleared:"기록을 지웠습니다."},
+boardSetup:"보드 설정",teamKey:"팀 공용 키",boardName:"내 보드 이름",operator:"담당자 이름",
+setupTitle:"하키티비 스코어보드 시작하기",
+setupDesc:"여러 명이 동시에 각자 중계할 수 있습니다. 내 보드를 구분할 이름을 정하세요.",
+teamKeyHint:"하키티비 팀원 전체가 같은 값을 씁니다. 처음 쓰는 분이 만든 값을 팀에 공유하고, 나머지 분들은 그 값을 그대로 붙여넣으세요. 외부에 공개하지 마세요.",
+boardNameHint:"영문/숫자로 짧게. 예: rink1, kim, u18. 사람마다 다르게 정해야 합니다.",
+startBtn:"시작하기",teamStatus:"우리 팀 현황 (실시간)",
+noBoards:"지금 켜져 있는 다른 보드가 없습니다.",
+dupWarn:"⚠ 같은 보드 이름을 다른 사람이 쓰고 있습니다! 설정에서 보드 이름을 바꾸세요. 그대로 두면 서로 점수가 덮어써집니다.",
+pushPreset:"⬆ 현재 설정을 팀에 배포",pullPreset:"⬇ 팀 설정 가져오기",
+presetPushed:"팀 설정으로 배포했습니다. 다른 분들은 '팀 설정 가져오기'를 누르면 됩니다.",
+presetPulled:"팀 설정을 가져왔습니다.",presetNone:"배포된 팀 설정이 없습니다.",
+presetHint:"팀·색상·글꼴·피리어드 설정을 한 사람이 맞춰두고 배포하면, 나머지 팀원은 한 번에 똑같이 맞출 수 있습니다. (점수·기록은 각자 따로입니다)",
+changeBoard:"보드 이름을 바꾸면 OBS 주소도 다시 넣어야 합니다. 계속할까요?",
+myBoard:"내 보드",sumScore:"최종 스코어",sumSOG:"유효슛",sumGoals:"득점",sumPens:"페널티",sumSO:"슛아웃",sumNotes:"메모",logCleared:"기록을 지웠습니다."},
 en:{openDisplay:"Open Display",copyBug:"Copy scorebug URL",copyTicker:"Copy ticker URL",resetGame:"Reset game",
 preview:"Scoreboard preview",hide:"Hide",show:"Show",score:"Score",sog:"SOG",reset:"Reset",addPenalty:"Add penalty",
 activePenalties:"Active penalties",emptyNet:"Empty net",timeout:"Timeout",timerBuzzer:"Timer and Buzzer",start:"Start",pause:"Pause",
@@ -452,7 +503,19 @@ noLog:"No entries yet. Scores and penalties are recorded automatically.",
 evGoal:"Goal",evGoalCancel:"Goal cancelled",evPen:"Penalty",evPenEnd:"Penalty ended",evPeriod:"Period",evFinal:"Final",
 evTimeout:"Timeout",evEN:"Empty net",evENoff:"Empty net off",evSoHit:"SO hit",evSoMiss:"SO miss",
 evNote:"Note",evStart:"Clock start",evStop:"Clock stop",evReset:"Game reset",
-sumScore:"Final score",sumSOG:"Shots on goal",sumGoals:"Goals",sumPens:"Penalties",sumSO:"Shootout",sumNotes:"Notes",logCleared:"Log cleared."}};
+boardSetup:"Board setup",teamKey:"Team key",boardName:"Board name",operator:"Operator",
+setupTitle:"Set up your scoreboard",
+setupDesc:"Several people can stream at the same time. Pick a name that identifies your board.",
+teamKeyHint:"Everyone on the team uses the same value. Share it with your staff and keep it private.",
+boardNameHint:"Short, letters/numbers. e.g. rink1, kim, u18. Must be unique per person.",
+startBtn:"Start",teamStatus:"Team status (live)",
+noBoards:"No other boards are online right now.",
+dupWarn:"\u26a0 Another operator is using the same board name! Change it in Setup, or you will overwrite each other.",
+pushPreset:"\u2b06 Publish these settings to the team",pullPreset:"\u2b07 Pull team settings",
+presetPushed:"Published. Others can now pull it.",presetPulled:"Team settings applied.",presetNone:"No team settings published yet.",
+presetHint:"One person configures teams, colours, fonts and periods, then publishes. Everyone else applies it in one click. (Scores and logs stay separate.)",
+changeBoard:"Changing the board name changes your OBS URL. Continue?",
+myBoard:"My board",sumScore:"Final score",sumSOG:"Shots on goal",sumGoals:"Goals",sumPens:"Penalties",sumSO:"Shootout",sumNotes:"Notes",logCleared:"Log cleared."}};
 let LANG="ko";
 const t=k=>(I18N[LANG][k]||I18N.en[k]||k);
 
@@ -500,9 +563,15 @@ function activePen(k){return S.live[k].pen.filter(p=>penLive(p)>0)}
 const P=new URLSearchParams(location.search);
 const VIEW=P.get("view")||"";
 const IS_DISPLAY=VIEW==="bug"||VIEW==="ticker"||VIEW==="full";
-let ROOM=P.get("room")||localStorage.getItem("htv_room")||("htv"+rid()+rid());
-if(!P.get("room"))localStorage.setItem("htv_room",ROOM);
+const slug=v=>String(v||"").toLowerCase().replace(/[^a-z0-9-]/g,"").slice(0,24);
+let TEAMKEY=localStorage.getItem("htv_teamkey")||"";
+let BOARD=localStorage.getItem("htv_board")||"";
+let OPERATOR=localStorage.getItem("htv_operator")||"";
+const CLIENTID="htv_"+rid()+rid();
+function calcRoom(){return slug(TEAMKEY)+"_"+slug(BOARD)}
+let ROOM=P.get("room")||(TEAMKEY&&BOARD?calcRoom():(localStorage.getItem("htv_room")||""));
 const TOPIC=n=>"hockeytv/sb/"+ROOM+"/"+n;
+const TEAMT=n=>"hockeytv/team/"+slug(TEAMKEY)+"/"+n;
 let bc=null;try{bc=new BroadcastChannel("htv_sb_"+ROOM)}catch(e){}
 const BROKERS=["wss://broker.emqx.io:8084/mqtt","wss://broker.hivemq.com:8884/mqtt","wss://test.mosquitto.org:8081/mqtt"];
 let mq=null,mqReady=false,bIdx=0,connTries=0;
@@ -511,17 +580,23 @@ function initMQ(){
  const url=BROKERS[bIdx%BROKERS.length];
  try{
   if(mq){try{mq.end(true)}catch(e){}}
-  mq=mqtt.connect(url,{clientId:"htv_"+rid()+rid(),reconnectPeriod:0,connectTimeout:7000,clean:true,keepalive:30});
+  mq=mqtt.connect(url,{clientId:CLIENTID+rid(),reconnectPeriod:0,connectTimeout:7000,clean:true,keepalive:30});
   mq.on("connect",()=>{mqReady=true;connTries=0;setNet(true);
    if(IS_DISPLAY){mq.subscribe(TOPIC("cfg"),{qos:0});mq.subscribe(TOPIC("live"),{qos:0})}
-   else{pubCfg();pubLive()}});
+   else{if(TEAMKEY){mq.subscribe(TEAMT("presence/+"),{qos:0});mq.subscribe(TEAMT("preset"),{qos:0})}
+    pubCfg();pubLive();pubPresence()}});
   const retry=()=>{mqReady=false;setNet(false);
    connTries++;if(connTries%2===0)bIdx++;
    setTimeout(initMQ,Math.min(15000,2000*connTries))};
   mq.on("close",retry);mq.on("error",()=>{});
-  mq.on("message",(tp,pl)=>{if(!IS_DISPLAY)return;
+  mq.on("message",(tp,pl)=>{
    try{const d=JSON.parse(pl.toString());
-    if(tp.endsWith("/cfg")){S.cfg=d;applyCfgToDisplay()}else{S.live=d}
+    if(!IS_DISPLAY){
+     if(tp.endsWith("/preset")){teamPreset=d;return}
+     if(tp.indexOf("/presence/")>0){
+      if(d&&d.cid&&d.cid!==CLIENTID){peers[d.cid]=d;peers[d.cid].seen=now();renderTeam()}}
+     return}
+    if(tp.endsWith("/cfg")){S.cfg=d;applyCfgToDisplay()}else if(tp.endsWith("/live")){S.live=d}
     renderAll()}catch(e){}});
  }catch(e){setTimeout(()=>{bIdx++;initMQ()},3000)}
 }
@@ -538,7 +613,7 @@ function pubCfg(){if(IS_DISPLAY)return;
  if(bc)try{bc.postMessage({k:"cfg",d:s})}catch(e){}
  if(mq&&mqReady)mq.publish(TOPIC("cfg"),s,{retain:true,qos:0});
  saveLocal()}
-function push(){pubLive();renderAll()}
+function push(){pubLive();renderAll();if(!IS_DISPLAY)pubPresence()}
 function pushCfg(){pubCfg();renderAll()}
 if(bc)bc.onmessage=e=>{if(!IS_DISPLAY)return;const {k,d}=e.data||{};
  if(k==="cfg"){S.cfg=JSON.parse(d);applyCfgToDisplay()}else if(k==="live"){S.live=JSON.parse(d)}renderAll()};
@@ -723,6 +798,33 @@ function applyI18N(){$$("[data-i18n]").forEach(e=>{const k=e.getAttribute("data-
  $("#penFreeze")&&$("#penFreeze").parentElement.querySelector("span")&&($("#penFreeze").parentElement.querySelector("span").textContent=t("penRealtime"));
  document.documentElement.lang=LANG}
 
+/* ---- team presence ---- */
+const peers={};let teamPreset=null,teamMemo="";
+function pubPresence(){
+ if(IS_DISPLAY||!mq||!mqReady||!TEAMKEY||!BOARD)return;
+ const d={cid:CLIENTID,board:slug(BOARD),op:OPERATOR||"",
+  h:S.cfg.home.name,a:S.cfg.away.name,hs:S.live.home.score,as:S.live.away.score,
+  p:periodName(),run:!!S.live.clock.running,ck:fmt(clockLive()),ts:now()};
+ try{mq.publish(TEAMT("presence/"+slug(BOARD)+"-"+CLIENTID),JSON.stringify(d),{qos:0})}catch(e){}}
+function renderTeam(){
+ const g=$("#teamGrid");if(!g)return;
+ const cut=now()-25000;let dup=false;
+ const list=Object.values(peers).filter(p=>p.seen>cut&&p.cid!==CLIENTID);
+ list.forEach(p=>{if(p.board===slug(BOARD))dup=true});
+ const me={cid:CLIENTID,board:slug(BOARD),op:OPERATOR,h:S.cfg.home.name,a:S.cfg.away.name,
+  hs:S.live.home.score,as:S.live.away.score,p:periodName(),run:!!S.live.clock.running,ck:fmt(clockLive())};
+ const all=BOARD?[me].concat(list):list;
+ const row=(p,isMe)=>`<div class="brow${isMe?" me":""}${(!isMe&&p.board===slug(BOARD))?" dup":""}">
+   <span class="blive${p.run?"":" idle"}"></span>
+   <span><span class="bname">${esc(p.board)}</span>${p.op?` <span class="bmeta">· ${esc(p.op)}</span>`:""}
+     <div class="bmeta">${esc(p.h)} vs ${esc(p.a)} · ${esc(p.p)} ${esc(p.ck||"")}</div></span>
+   <span class="bscore">${p.hs} : ${p.as}</span></div>`;
+ const h=all.length?all.map((p,i)=>row(p,BOARD&&i===0)).join(""):`<div class="hint" style="padding:10px">${t("noBoards")}</div>`;
+ if(teamMemo!==h){teamMemo=h;g.innerHTML=h}
+ const w=$("#dupWarn");if(w)w.style.display=dup?"block":"none";
+ const mt=$("#myBoardTag");if(mt)mt.textContent=BOARD?t("myBoard")+": "+slug(BOARD)+(OPERATOR?" ("+OPERATOR+")":""):"";}
+setInterval(()=>{pubPresence();if(!IS_DISPLAY)renderTeam()},8000);
+
 /* ---- game log ---- */
 function logEv(type,team,detail){
  S.log.push({ts:now(),gc:Math.round(clockLive()),p:S.live.pIdx,type,team:team||"",detail:detail||""});
@@ -859,10 +961,47 @@ function boot(){
   document.addEventListener("click",()=>{ac();userGesture=true},{once:true});
   return;
  }
- loadLocal();applyI18N();bindControls();bindSetup();fillSetup();renderLog();initMQ();setNet(false);renderAll();
+ loadLocal();applyI18N();bindControls();bindSetup();bindBoard();fillSetup();renderLog();
+ if(!TEAMKEY||!BOARD){openSetupModal();return}
+ initMQ();setNet(false);renderAll();renderTeam();
  setTimeout(()=>{pubCfg();pubLive()},1200);
 }
 
+function openSetupModal(){
+ if(!TEAMKEY)TEAMKEY=localStorage.getItem("htv_teamkey")||("htv-"+rid()+rid());
+ $("#mTeamKey").value=TEAMKEY;$("#mBoard").value=BOARD;$("#mOp").value=OPERATOR;
+ $("#setupModal").style.display="flex";
+ setTimeout(()=>$("#mBoard").focus(),100)}
+function saveBoard(k,b,o,reload){
+ k=slug(k);b=slug(b);
+ if(!k||!b)return false;
+ TEAMKEY=k;BOARD=b;OPERATOR=(o||"").trim();
+ localStorage.setItem("htv_teamkey",k);localStorage.setItem("htv_board",b);localStorage.setItem("htv_operator",OPERATOR);
+ ROOM=calcRoom();localStorage.setItem("htv_room",ROOM);
+ if(reload)location.href=location.pathname;
+ return true}
+function bindBoard(){
+ $("#mSave").onclick=()=>{
+  if(!saveBoard($("#mTeamKey").value,$("#mBoard").value,$("#mOp").value,true)){
+   alert(LANG==="ko"?"팀 공용 키와 보드 이름을 모두 입력하세요. (영문/숫자)":"Enter both team key and board name.")}};
+ $("#mBoard").onkeydown=e=>{if(e.key==="Enter")$("#mSave").click()};
+ const apply=()=>{const b=slug($("#boardName").value),k=slug($("#teamKey").value);
+  if(!b||!k)return;
+  if(b!==slug(BOARD)||k!==slug(TEAMKEY)){if(!confirm(t("changeBoard"))){fillSetup();return}
+   saveBoard(k,b,$("#operatorName").value,true);return}
+  OPERATOR=$("#operatorName").value.trim();localStorage.setItem("htv_operator",OPERATOR);pubPresence()};
+ $("#boardName").onchange=apply;$("#teamKey").onchange=apply;$("#operatorName").onchange=apply;
+ $("#presetPush").onclick=()=>{
+  if(!mq||!mqReady){alert("오프라인 상태입니다.");return}
+  const preset=JSON.parse(JSON.stringify(S.cfg));
+  mq.publish(TEAMT("preset"),JSON.stringify(preset),{retain:true,qos:0});
+  alert(t("presetPushed"))};
+ $("#presetPull").onclick=()=>{
+  if(!teamPreset){alert(t("presetNone"));return}
+  if(!confirm(LANG==="ko"?"팀 설정으로 덮어씁니다. 지금 내 팀 이름·색상·로고 설정이 바뀝니다. 계속할까요?":"Overwrite your settings with the team preset?"))return;
+  S.cfg=JSON.parse(JSON.stringify(teamPreset));LANG=S.cfg.lang||LANG;
+  applyI18N();fillSetup();pushCfg();alert(t("presetPulled"))};
+}
 function bindControls(){
  document.addEventListener("click",e=>{
   const b=e.target.closest("[data-act]");
@@ -947,6 +1086,7 @@ function fillSetup(){
  $("#tickerBg").value=tk.bg;$("#tickerBgT").value=tk.bg;$("#tickerFg").value=tk.fg;$("#tickerFgT").value=tk.fg;
  $("#audioOn").checked=S.cfg.audio.on;$("#hornOn").checked=S.cfg.audio.horn;
  $("#urlBug").value=urlFor("bug");$("#urlTicker").value=urlFor("ticker");$("#roomCode").value=ROOM;
+ $("#boardName").value=slug(BOARD);$("#teamKey").value=slug(TEAMKEY);$("#operatorName").value=OPERATOR;
  renderPeriods();
 }
 function renderPeriods(){
@@ -1028,9 +1168,6 @@ function bindSetup(){
  $("#periodEditor").addEventListener("click",e=>{const el=e.target.closest('[data-p="del"]');if(!el)return;
   if(S.cfg.periods.length<=1)return;S.cfg.periods.splice(+el.dataset.i,1);
   S.live.pIdx=Math.min(S.live.pIdx,S.cfg.periods.length-1);renderPeriods();pubLive();pushCfg()});
- $("#roomNew").onclick=()=>{if(!confirm(LANG==="ko"?"새 코드를 만들면 OBS 주소도 다시 넣어야 합니다. 계속할까요?":"Continue?"))return;
-  ROOM="htv"+rid()+rid();localStorage.setItem("htv_room",ROOM);location.href=location.pathname};
- $("#roomCode").onchange=e=>{ROOM=e.target.value.trim()||ROOM;localStorage.setItem("htv_room",ROOM);location.href=location.pathname};
  $("#btnExport").onclick=()=>{const blob=new Blob([JSON.stringify(S.cfg,null,1)],{type:"application/json"});
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="hockeytv-scoreboard-config.json";a.click()};
  $("#btnImport").onclick=()=>$("#importFile").click();
