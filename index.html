@@ -389,6 +389,12 @@ table.logtbl tr:hover td{background:#1b2236}
         <select id="fontSel"></select>
         <label class="f" data-i18n="fontKR"></label>
         <select id="fontKRSel"></select>
+        <label class="f" data-i18n="boardLang"></label>
+        <select id="boardLangSel">
+          <option value="en">English (기본)</option>
+          <option value="ko">한국어</option>
+        </select>
+        <div class="hint" data-i18n="boardLangHint"></div>
         <label class="f" data-i18n="fontWeight"></label>
         <select id="fontWeightSel">
           <option value="400">보통 Regular</option>
@@ -501,7 +507,7 @@ obsUrls:"OBS 브라우저 소스 주소",roomCode:"동기화 코드 (Room)",newR
 roomHint:"OBS와 조작 화면이 이 코드로 연결됩니다. 이 코드를 아는 사람만 내 보드를 볼 수 있으니 공유하지 마세요.",
 exportCfg:"설정 내보내기",importCfg:"설정 불러오기",goal:"골!",powerplay:"파워플레이",finalTxt:"경기 종료",shootout:"SO",
 fontKR:"한글 글꼴",fontHint:"두 목록에 모든 글꼴이 들어 있습니다. 위는 영문·숫자, 아래는 한글에 적용되고, 위에서 \"↑ 한글 글꼴과 동일하게\"를 고르면 전체가 한 글꼴로 통일됩니다. 코트라·잘난체·검은고딕처럼 굵기가 하나뿐인 글꼴은 굵기를 바꿔도 그대로 나옵니다.",
-fontWeight:"글자 굵기",customFont:"직접 추가할 웹폰트 주소 (woff / woff2)",customFontHint:"눈누(noonnu.cc)에서 원하는 글꼴의 웹폰트 코드에 있는 url만 복사해 붙여넣으면 두 목록 맨 아래 '직접 추가한 글꼴'로 나타납니다.",
+boardLang:"보드에 나오는 글자 언어",boardLangHint:"엠티넷·타임아웃·파워플레이·GOAL·FINAL 등 화면에 나가는 글자입니다. 팀 이름과 제목은 직접 입력한 대로 나옵니다.",fontWeight:"글자 굵기",customFont:"직접 추가할 웹폰트 주소 (woff / woff2)",customFontHint:"눈누(noonnu.cc)에서 원하는 글꼴의 웹폰트 코드에 있는 url만 복사해 붙여넣으면 두 목록 맨 아래 '직접 추가한 글꼴'로 나타납니다.",
 soHit:"성공",soMiss:"실패",soUndo:"↩ 되돌리기",soReset:"슛아웃 초기화",soRoundLabel:"슛아웃 · 라운드",
 replayMode:"🔴 리플레이 표시 (R)",replay:"리플레이",replayHide:"리플레이 중 점수판 흐리게",replayHint:"OBS의 '다시보기 버퍼'와 같이 씁니다. 설정법은 사용법 문서 9번을 보세요.",
 gameLog:"경기 기록",logTime:"시간",logPeriod:"P",logType:"종류",logTeam:"팀",logDetail:"내용",
@@ -554,7 +560,7 @@ obsUrls:"OBS browser source URLs",roomCode:"Sync code (Room)",newRoom:"New",
 roomHint:"OBS and this control page are linked by this code. Keep it private.",
 exportCfg:"Export settings",importCfg:"Import settings",goal:"GOAL!",powerplay:"POWER PLAY",finalTxt:"FINAL",shootout:"SO",
 fontKR:"Korean font",fontHint:"Latin and numbers use the font above; Korean the one below. Single-weight display fonts ignore the weight setting.",
-fontWeight:"Font weight",customFont:"Custom webfont URL (woff / woff2)",customFontHint:"Paste a direct font file URL; it appears as 'Custom font' at the bottom of both lists.",
+boardLang:"On-screen text language",boardLangHint:"Applies to Empty net, Timeout, Power play, GOAL, FINAL etc. Team names and title show exactly as typed.",fontWeight:"Font weight",customFont:"Custom webfont URL (woff / woff2)",customFontHint:"Paste a direct font file URL; it appears as 'Custom font' at the bottom of both lists.",
 soHit:"Hit",soMiss:"Miss",soUndo:"↩ Undo",soReset:"Reset shootout",soRoundLabel:"SHOOTOUT · ROUND",
 replayMode:"🔴 Replay tag (R)",replay:"REPLAY",replayHide:"Dim the board during replay",replayHint:"Use together with the OBS Replay Buffer — see section 9 of the guide.",
 gameLog:"Game log",logTime:"Time",logPeriod:"P",logType:"Event",logTeam:"Team",logDetail:"Detail",
@@ -585,6 +591,8 @@ soRestored:"Shootout mode off — previous period and clock restored.",
 myBoard:"My board",sumScore:"Final score",sumSOG:"Shots on goal",sumGoals:"Goals",sumPens:"Penalties",sumSO:"Shootout",sumNotes:"Notes",logCleared:"Log cleared."}};
 let LANG="ko";
 const t=k=>(I18N[LANG][k]||I18N.en[k]||k);
+// 화면(방송)에 나가는 글자 전용 — 조작 화면 언어와 무관하게 따로 지정
+const bt=k=>{const L=(typeof S!=="undefined"&&S.cfg&&S.cfg.board&&S.cfg.board.lang)||"en";return (I18N[L]&&I18N[L][k])||I18N.en[k]||k};
 
 /* ================= state ================= */
 const DEF_PERIODS=[{n:"1st",len:"20:00"},{n:"2nd",len:"20:00"},{n:"3rd",len:"20:00"},{n:"OT",len:"5:00"},{n:"SO",len:"0:00"}];
@@ -594,7 +602,7 @@ const DEFAULT={
  cfg:{home:team("HOME","#131a33","#f5c518"),away:team("AWAY","#c01722","#ffffff"),
   board:{layout:"bug",bg:"#131a33",fg:"#ffffff",font:"__same",fontKR:"Black Han Sans",customUrl:"",weight:400,scale:100,
    showTitle:false,title:"",titleBg:"#131a33",titleFg:"#ffffff",
-   showPeriod:true,showSOG:true,showRec:true,penTop:false,pp:false,goalH:true,goalA:true,replayDim:true,pos:"tl",margin:40},
+   showPeriod:true,showSOG:true,showRec:true,penTop:false,pp:false,goalH:true,goalA:true,replayDim:true,pos:"tl",margin:40,lang:"en"},
   timer:{show:true,countUp:false,autoBuzz:false,penRealtime:false},
   periods:JSON.parse(JSON.stringify(DEF_PERIODS)),
   ticker:{text:"",speed:25,bg:"#131a33",fg:"#ffffff"},
@@ -744,15 +752,15 @@ function soHTML(k){const c=S.cfg[k],l=S.live[k];
 
 function underHTML(k,row){const c=S.cfg[k],l=S.live[k],b=S.cfg.board;let h="";
  if(S.live.shootout)h+=soHTML(k);
- if(l.en)h+=`<div class="sbbanner" style="background:${c.bg}cc;color:${c.fg}">${t("emptyNet")}</div>`;
- if(l.to)h+=`<div class="sbbanner stripe" style="background:${c.bg}cc;color:${c.fg}">${t("timeout")}</div>`;
+ if(l.en)h+=`<div class="sbbanner" style="background:${c.bg}cc;color:${c.fg}">${bt("emptyNet")}</div>`;
+ if(l.to)h+=`<div class="sbbanner stripe" style="background:${c.bg}cc;color:${c.fg}">${bt("timeout")}</div>`;
  const pens=activePen(k);
  const pen1=p=>`<div class="sbpen" style="background:${c.bg}cc;color:${c.fg}">${esc(p.num)} &nbsp;-&nbsp; ${fmt(penLive(p))}</div>`;
  if(b.pp){
   const opp=k==="home"?"away":"home",oppPens=activePen(opp);
   if(oppPens.length>pens.length){
    const soonest=Math.min(...oppPens.map(penLive));
-   h+=`<div class="sbpen" style="background:${c.bg}cc;color:${c.fg}">${t("powerplay")} ${fmt(soonest)}</div>`}
+   h+=`<div class="sbpen" style="background:${c.bg}cc;color:${c.fg}">${bt("powerplay")} ${fmt(soonest)}</div>`}
  }else h+=pens.map(pen1).join("");
  return `<div class="sbucol" style="grid-row:${row};grid-column:${k==="home"?1:2}">${h}</div>`}
 
@@ -764,11 +772,11 @@ function bugHTML(){const b=S.cfg.board,tm=S.cfg.timer,L=S.live;
  if(b.penTop){if(hasSO)R.so=r++;R.under=r++;R.main=r++;if(hasTitle)R.title=r++}
  else{if(hasTitle)R.title=r++;if(hasSO)R.so=r++;R.main=r++;R.under=r++}
  const clockBox=tm.show?`<div class="sbclock" style="background:${b.bg};color:${b.fg};grid-row:${R.main};grid-column:3">
-   <div class="sbtime">${L.final?t("finalTxt"):fmt(clockLive(),true)}</div>
-   ${b.showPeriod?`<div class="sbperiod">${L.shootout?t("shootout"):esc(periodName())}</div>`:""}</div>`:"";
+   <div class="sbtime">${L.final?bt("finalTxt"):fmt(clockLive(),true)}</div>
+   ${b.showPeriod?`<div class="sbperiod">${L.shootout?bt("shootout"):esc(periodName())}</div>`:""}</div>`:"";
  const title=hasTitle?`<div class="sbtitle" style="background:${b.titleBg};color:${b.titleFg};grid-row:${R.title}">${esc(b.title)}</div>`:"";
- const sobar=hasSO?`<div class="sbtitle" style="background:${b.bg};color:${b.fg};grid-row:${R.so}">${t("soRoundLabel")}: ${soRound()}</div>`:"";
- const repbar=hasRep?`<div class="sbreplay" style="background:#c81622;color:#fff;grid-row:${R.rep}"><i></i>${t("replay")}</div>`:"";
+ const sobar=hasSO?`<div class="sbtitle" style="background:${b.bg};color:${b.fg};grid-row:${R.so}">${bt("soRoundLabel")}: ${soRound()}</div>`:"";
+ const repbar=hasRep?`<div class="sbreplay" style="background:#c81622;color:#fff;grid-row:${R.rep}"><i></i>${bt("replay")}</div>`:"";
  const dim=(hasRep&&b.replayDim!==false)?" dimmed":"";
  const grid=`<div class="sbgrid${dim}">${repbar}${sideHTML("home",R.main)}${sideHTML("away",R.main)}${clockBox}${underHTML("home",R.under)}${underHTML("away",R.under)}${title}${sobar}</div>`;
  return `<div class="sbwrap${b.layout==="bugc"?" center":""}" style="--sbfont:${fontStack()};--sbw:${b.weight||400};font-size:${30*b.scale/100}px">${grid}</div>`}
@@ -780,7 +788,7 @@ function fullHTML(){const b=S.cfg.board,tm=S.cfg.timer;
  const pens=["home","away"].map(k=>activePen(k).map(p=>`<span style="color:${S.cfg[k].fg};background:${S.cfg[k].bg};padding:.1em .4em;border-radius:4px;margin:0 .2em">${esc(p.num)} ${fmt(penLive(p))}</span>`).join("")).join("");
  return `<div class="fsb" style="--sbfont:${fontStack()};--sbw:${b.weight||400};font-size:${18*b.scale/100}px;background:${b.bg};color:${b.fg};padding:.6em 1em;border-radius:8px">
   ${b.showTitle&&b.title?`<div style="font-size:1.6em;font-weight:700">${esc(b.title)}</div>`:""}
-  <div class="fsbrow">${T("home")}<div class="fsbmid"><div class="t">${S.live.final?t("finalTxt"):fmt(clockLive(),true)}</div><div class="p">${esc(periodName())}</div></div>${T("away")}</div>
+  <div class="fsbrow">${T("home")}<div class="fsbmid"><div class="t">${S.live.final?bt("finalTxt"):fmt(clockLive(),true)}</div><div class="p">${esc(periodName())}</div></div>${T("away")}</div>
   <div style="font-size:1.2em;font-weight:700">${pens}</div></div>`}
 
 function tickerHTML(){const k=S.cfg.ticker;const txt=(k.text||"").trim();
@@ -845,7 +853,7 @@ function goalAnim(k){const el=$("#goalfx");if(!el)return;const c=S.cfg[k],b=S.cf
  const px=30*b.scale/100;
  el.innerHTML=`<span style="--sbfont:${fontStack()};--sbw:${b.weight||400};background:${c.bg}f2;color:${c.fg};font-size:${px*1.7}px">
    ${c.logo?`<img src="${c.logo}" style="height:1.5em;width:1.5em;object-fit:contain">`:""}
-   <b style="font-size:.85em">${esc(c.name)}</b><b>${t("goal")}</b></span>`;
+   <b style="font-size:.85em">${esc(c.name)}</b><b>${bt("goal")}</b></span>`;
  clearTimeout(goalAnim._t);goalAnim._t=setTimeout(()=>{const e=$("#goalfx");if(e)e.innerHTML=""},2700)}
 window.addEventListener("resize",()=>{const r=IS_DISPLAY?$("#displayRoot"):$("#previewStage");if(r)layoutFit(r)});
 function applyCfgToDisplay(){LANG=S.cfg.lang||"ko";document.documentElement.lang=LANG}
@@ -1214,7 +1222,7 @@ function fillSetup(){
  $("#boardBg").value=b.bg;$("#boardBgT").value=b.bg;$("#boardFg").value=b.fg;$("#boardFgT").value=b.fg;
  buildFontSelects();
  $("#fontSel").value=b.font||"__same";$("#fontKRSel").value=b.fontKR||"Black Han Sans";
- $("#customFontUrl").value=b.customUrl||"";$("#fontWeightSel").value=String(b.weight||400);$("#fsVal").textContent=b.scale+"%";
+ $("#customFontUrl").value=b.customUrl||"";$("#boardLangSel").value=b.lang||"en";$("#fontWeightSel").value=String(b.weight||400);$("#fsVal").textContent=b.scale+"%";
  $("#showTitle").checked=b.showTitle;$("#titleText").value=b.title;
  $("#titleBg").value=b.titleBg;$("#titleBgT").value=b.titleBg;$("#titleFg").value=b.titleFg;$("#titleFgT").value=b.titleFg;
  $("#optPeriod").checked=b.showPeriod;$("#optSOG").checked=b.showSOG;$("#optRec").checked=b.showRec;
@@ -1284,6 +1292,7 @@ function bindSetup(){
  pair("#tickerFg","#tickerFgT",v=>S.cfg.ticker.fg=v);
  $("#fontSel").onchange=e=>{S.cfg.board.font=e.target.value;pushCfg()};
  $("#fontKRSel").onchange=e=>{S.cfg.board.fontKR=e.target.value;pushCfg()};
+ $("#boardLangSel").onchange=e=>{S.cfg.board.lang=e.target.value;memo.board=null;pushCfg()};
  $("#fontWeightSel").onchange=e=>{S.cfg.board.weight=parseInt(e.target.value);pushCfg()};
  $("#customFontUrl").onchange=e=>{S.cfg.board.customUrl=e.target.value.trim();addCustomOptions();applyCustomFont();pushCfg()};
  $("#fsMinus").onclick=()=>{S.cfg.board.scale=Math.max(40,S.cfg.board.scale-5);$("#fsVal").textContent=S.cfg.board.scale+"%";pushCfg()};
