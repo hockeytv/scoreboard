@@ -166,9 +166,12 @@ table.logtbl tr:hover td{background:#1b2236}
 .logtbl .del{cursor:pointer;color:#8b93ad;border:none;background:none;font-size:14px}
 .logtbl .del:hover{color:#ff6b6b}
 .logempty{padding:24px;text-align:center;color:var(--muted);font-size:13px}
-/* view mode containers */
-#displayRoot{position:fixed;inset:0;padding:0;margin:0}
-#displayRoot.pos-tl{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:4px}
+/* 1920x1080 fit stage */
+#displayRoot{position:fixed;inset:0;padding:0;margin:0;overflow:hidden}
+.fitstage{position:absolute;top:0;left:0;width:1920px;height:1080px;transform-origin:top left}
+.poswrap{position:absolute;inset:0;display:flex}
+.tickerhost{position:absolute;left:0;right:0;bottom:0}
+#previewBody{position:relative;overflow:hidden}
 .sbwrap,.sbwrap *,.fsb,.fsb *,.tickerbar,.tickerbar *,.goalfx span,.goalfx span *{font-weight:var(--sbw,400)}
 #audioNotice{position:fixed;left:8px;bottom:8px;background:#000a;color:#fff;padding:6px 10px;border-radius:6px;font-size:12px;font-family:sans-serif;cursor:pointer;z-index:99}
 </style>
@@ -203,7 +206,7 @@ table.logtbl tr:hover td{background:#1b2236}
 
   <div class="section">
     <h3><span data-i18n="preview"></span><button class="btn sm" id="btnTogglePrev" data-i18n="hide"></button></h3>
-    <div class="body" id="previewBody" style="padding:16px"><div id="previewStage"></div></div>
+    <div class="body" id="previewBody" style="padding:0"><div id="previewStage" style="width:100%"></div></div>
   </div>
 
   <div class="ctrlgrid">
@@ -318,13 +321,22 @@ table.logtbl tr:hover td{background:#1b2236}
       </div></div>
     </div>
 
-    <div class="section" style="margin:12px 0 0"><h3><span data-i18n="boardLayout"></span></h3><div class="body grid2">
+    <div class="section" style="margin:12px 0 0"><h3><span data-i18n="boardLayout"></span></h3><div class="body grid3">
       <div>
         <label class="sw"><input type="radio" name="layout" value="bug"><i></i><span data-i18n="layBug"></span></label>
         <label class="sw"><input type="radio" name="layout" value="bugc"><i></i><span data-i18n="layBugC"></span></label>
         <label class="sw"><input type="radio" name="layout" value="full"><i></i><span data-i18n="layFull"></span></label>
       </div>
-      <div class="hint" data-i18n="layoutHint"></div>
+      <div>
+        <label class="f" data-i18n="boardPos"></label>
+        <select id="posSel">
+          <option value="tl" data-i18n="posTL"></option><option value="tc" data-i18n="posTC"></option><option value="tr" data-i18n="posTR"></option>
+          <option value="bl" data-i18n="posBL"></option><option value="bc" data-i18n="posBC"></option><option value="br" data-i18n="posBR"></option>
+        </select>
+        <label class="f" data-i18n="boardMargin"></label>
+        <input type="number" id="marginNum" min="0" max="300" step="5">
+        <div class="hint" style="margin-top:8px" data-i18n="obsSize"></div>
+      </div>
     </div></div>
 
     <div class="section" style="margin:12px 0 0"><h3><span data-i18n="boardAppearance"></span></h3><div class="body grid3">
@@ -398,6 +410,7 @@ table.logtbl tr:hover td{background:#1b2236}
       </div>
       <div>
         <label class="f" data-i18n="obsUrls"></label>
+        <div class="hint" style="margin-bottom:6px" data-i18n="obsSize"></div>
         <div class="copybox"><input type="text" id="urlBug" readonly><button class="btn sm" data-copy="urlBug">복사</button></div>
         <div class="copybox"><input type="text" id="urlTicker" readonly><button class="btn sm" data-copy="urlTicker">복사</button></div>
         <label class="f" data-i18n="boardName"></label>
@@ -469,6 +482,9 @@ presetPushed:"팀 설정으로 배포했습니다. 다른 분들은 '팀 설정 
 presetPulled:"팀 설정을 가져왔습니다.",presetNone:"배포된 팀 설정이 없습니다.",
 presetHint:"팀·색상·글꼴·피리어드 설정을 한 사람이 맞춰두고 배포하면, 나머지 팀원은 한 번에 똑같이 맞출 수 있습니다. (점수·기록은 각자 따로입니다)",
 changeBoard:"보드 이름을 바꾸면 OBS 주소도 다시 넣어야 합니다. 계속할까요?",
+boardPos:"화면 위치",boardMargin:"화면 가장자리 여백 (px)",
+posTL:"좌측 상단",posTC:"중앙 상단",posTR:"우측 상단",posBL:"좌측 하단",posBC:"중앙 하단",posBR:"우측 하단",
+obsSize:"⚠ OBS 브라우저 소스 크기는 반드시 너비 1920 / 높이 1080 으로 하세요. 그러면 위치·크기가 자동으로 딱 맞고, OBS에서 소스를 끌어 늘릴 필요가 없습니다.",
 myBoard:"내 보드",sumScore:"최종 스코어",sumSOG:"유효슛",sumGoals:"득점",sumPens:"페널티",sumSO:"슛아웃",sumNotes:"메모",logCleared:"기록을 지웠습니다."},
 en:{openDisplay:"Open Display",copyBug:"Copy scorebug URL",copyTicker:"Copy ticker URL",resetGame:"Reset game",
 preview:"Scoreboard preview",hide:"Hide",show:"Show",score:"Score",sog:"SOG",reset:"Reset",addPenalty:"Add penalty",
@@ -515,6 +531,9 @@ pushPreset:"\u2b06 Publish these settings to the team",pullPreset:"\u2b07 Pull t
 presetPushed:"Published. Others can now pull it.",presetPulled:"Team settings applied.",presetNone:"No team settings published yet.",
 presetHint:"One person configures teams, colours, fonts and periods, then publishes. Everyone else applies it in one click. (Scores and logs stay separate.)",
 changeBoard:"Changing the board name changes your OBS URL. Continue?",
+boardPos:"Screen position",boardMargin:"Edge margin (px)",
+posTL:"Top left",posTC:"Top center",posTR:"Top right",posBL:"Bottom left",posBC:"Bottom center",posBR:"Bottom right",
+obsSize:"\u26a0 Set the OBS browser source to 1920 x 1080. Everything then lines up automatically \u2014 no need to resize the source in OBS.",
 myBoard:"My board",sumScore:"Final score",sumSOG:"Shots on goal",sumGoals:"Goals",sumPens:"Penalties",sumSO:"Shootout",sumNotes:"Notes",logCleared:"Log cleared."}};
 let LANG="ko";
 const t=k=>(I18N[LANG][k]||I18N.en[k]||k);
@@ -527,7 +546,7 @@ const DEFAULT={
  cfg:{home:team("HOME","#131a33","#f5c518"),away:team("AWAY","#c01722","#ffffff"),
   board:{layout:"bug",bg:"#131a33",fg:"#ffffff",font:"__same",fontKR:"Black Han Sans",customUrl:"",weight:400,scale:100,
    showTitle:false,title:"",titleBg:"#131a33",titleFg:"#ffffff",
-   showPeriod:true,showSOG:true,showRec:true,penTop:false,pp:false,goalH:true,goalA:true,replayDim:true},
+   showPeriod:true,showSOG:true,showRec:true,penTop:false,pp:false,goalH:true,goalA:true,replayDim:true,pos:"tl",margin:40},
   timer:{show:true,countUp:false,autoBuzz:false,penRealtime:false},
   periods:JSON.parse(JSON.stringify(DEF_PERIODS)),
   ticker:{text:"",speed:25,bg:"#131a33",fg:"#ffffff"},
@@ -720,15 +739,35 @@ function boardHTML(){return S.cfg.board.layout==="full"?fullHTML():bugHTML()}
 
 let lastScore={home:0,away:0},fxSeen={buzz:0,horn:0},initedFx=false;
 const memo={board:null,ticker:null};
+const CANVAS_W=1920,CANVAS_H=1080;
 function ensureHosts(root){
- if(root.querySelector("#boardHost"))return;
- root.innerHTML=`<div id="boardHost" class="stagewrap"><div id="boardInner"></div><div class="goalfx" id="goalfx"></div></div><div id="tickerHost" style="width:100%"></div>`}
+ if(root.querySelector("#fitStage"))return;
+ root.innerHTML=`<div class="fitstage" id="fitStage">
+   <div class="poswrap" id="posWrap"><div id="boardHost" class="stagewrap"><div id="boardInner"></div><div class="goalfx" id="goalfx"></div></div></div>
+   <div class="tickerhost" id="tickerHost"></div></div>`}
+function layoutFit(root){
+ const st=root.querySelector("#fitStage");if(!st)return;
+ let cw,ch;
+ if(IS_DISPLAY){cw=window.innerWidth;ch=window.innerHeight}
+ else{cw=root.clientWidth||960;ch=Math.min(cw*CANVAS_H/CANVAS_W,520)}
+ if(!cw||!ch)return;
+ const sc=Math.min(cw/CANVAS_W,ch/CANVAS_H);
+ st.style.transform=`translate(${Math.round((cw-CANVAS_W*sc)/2)}px,${Math.round((ch-CANVAS_H*sc)/2)}px) scale(${sc})`;
+ if(!IS_DISPLAY){root.style.height=Math.round(CANVAS_H*sc)+"px";root.style.width="100%"}
+ const pw=root.querySelector("#posWrap"),b=S.cfg.board;
+ const p=b.pos||"tl",m=(b.margin==null?40:b.margin);
+ pw.style.padding=m+"px";
+ pw.style.alignItems=p[0]==="b"?"flex-end":"flex-start";
+ pw.style.justifyContent=p[1]==="c"?"center":p[1]==="r"?"flex-end":"flex-start";
+ pw.style.paddingBottom=(p[0]==="b"&&S.live.tickerOn?m+70:m)+"px";
+}
 function paint(root){
  ensureHosts(root);
  const bh=VIEW==="ticker"?"":boardHTML();
  if(bh!==memo.board){memo.board=bh;root.querySelector("#boardInner").innerHTML=bh}
  const th=tickerHTML();
  if(th!==memo.ticker){memo.ticker=th;root.querySelector("#tickerHost").innerHTML=th}
+ layoutFit(root);
 }
 function renderAll(){
  applyCustomFont();
@@ -754,6 +793,7 @@ function goalAnim(k){const el=$("#goalfx");if(!el)return;const c=S.cfg[k],b=S.cf
    ${c.logo?`<img src="${c.logo}" style="height:1.5em;width:1.5em;object-fit:contain">`:""}
    <b style="font-size:.85em">${esc(c.name)}</b><b>${t("goal")}</b></span>`;
  clearTimeout(goalAnim._t);goalAnim._t=setTimeout(()=>{const e=$("#goalfx");if(e)e.innerHTML=""},2700)}
+window.addEventListener("resize",()=>{const r=IS_DISPLAY?$("#displayRoot"):$("#previewStage");if(r)layoutFit(r)});
 function applyCfgToDisplay(){LANG=S.cfg.lang||"ko";document.documentElement.lang=LANG}
 
 /* ================= control UI ================= */
@@ -1071,6 +1111,7 @@ function fillSetup(){
  });
  const b=S.cfg.board;
  $$('input[name="layout"]').forEach(r=>r.checked=r.value===b.layout);
+ $("#posSel").value=b.pos||"tl";$("#marginNum").value=(b.margin==null?40:b.margin);
  $("#boardBg").value=b.bg;$("#boardBgT").value=b.bg;$("#boardFg").value=b.fg;$("#boardFgT").value=b.fg;
  buildFontSelects();
  $("#fontSel").value=b.font||"__same";$("#fontKRSel").value=b.fontKR||"Black Han Sans";
@@ -1134,6 +1175,8 @@ function bindSetup(){
   const lh=S.live.home;S.live.home=S.live.away;S.live.away=lh;fillSetup();pubLive();pushCfg()};
 
  $$('input[name="layout"]').forEach(r=>r.onchange=()=>{S.cfg.board.layout=r.value;pushCfg()});
+ $("#posSel").onchange=e=>{S.cfg.board.pos=e.target.value;pushCfg()};
+ $("#marginNum").oninput=e=>{S.cfg.board.margin=Math.max(0,parseInt(e.target.value||0));pushCfg()};
  pair("#boardBg","#boardBgT",v=>S.cfg.board.bg=v);
  pair("#boardFg","#boardFgT",v=>S.cfg.board.fg=v);
  pair("#titleBg","#titleBgT",v=>S.cfg.board.titleBg=v);
