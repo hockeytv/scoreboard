@@ -887,7 +887,6 @@ function updateControls(){
     <button class="pb del" data-pen="x" data-team="${k}" data-id="${p.id}">\u2715</button></div>`).join("")}
   S.live[k].pen.forEach(p=>{const el=list.querySelector('[data-row="'+p.id+'"] .ptime');
    if(el){const v=fmt(penLive(p));if(el.textContent!==v)el.textContent=v}});
-  const box=$("#"+pre+"PenAdd");if(box&&box.style.display!=="none"&&!S.live.clock)box.style.display="none";
  });
 }
 function applyI18N(){$$("[data-i18n]").forEach(e=>{const k=e.getAttribute("data-i18n");if(I18N[LANG][k])e.textContent=I18N[LANG][k]});
@@ -1119,7 +1118,6 @@ function bindControls(){
    const D={p1:1000,m1:-1000,p30:30000,m30:-30000};
    if(p.dataset.pen==="x"){logEv("penEnd",p.dataset.team,(arr[i].num?"#"+arr[i].num:"")+" (수동 삭제)");arr.splice(i,1)}
    else{arr[i].ms=Math.max(0,arr[i].ms+(D[p.dataset.pen]||0));if(arr[i].ms<=0)arr.splice(i,1)}
-   $("#"+(p.dataset.team==="home"?"h":"a")+"PenList").dataset.sig="";
    push();return}
   const pa=e.target.closest("[data-penadd]");
   if(pa){const k=pa.dataset.penadd;
@@ -1134,7 +1132,6 @@ function bindControls(){
    logEv("pen",k,(num?"#"+num+"  ":"")+fmt(ms));
    numEl.value="";cusEl.value="";
    $("#"+(k==="home"?"h":"a")+"PenAdd").style.display="none";
-   $("#"+(k==="home"?"h":"a")+"PenList").dataset.sig="";
    push();return}
   const pc=e.target.closest("[data-pencancel]");
   if(pc){$("#"+(pc.dataset.pencancel==="home"?"h":"a")+"PenAdd").style.display="none";return}
