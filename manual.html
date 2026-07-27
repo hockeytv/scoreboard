@@ -61,6 +61,7 @@ footer{text-align:center;color:var(--mut);font-size:13px;padding:36px 20px;borde
     <li><a href="#s3">OBS에 연결하기</a></li>
     <li><a href="#s4">경기 시작 전 준비</a></li>
     <li><a href="#s5">경기 중 조작</a></li>
+    <li><a href="#s5b">OBS 옆에 두고 쓰기 (창 배치)</a></li>
     <li><a href="#s6">페널티 넣고 빼기</a></li>
     <li><a href="#s7">승부치기(슛아웃)</a></li>
     <li><a href="#s8">경기가 끝나면</a></li>
@@ -73,6 +74,7 @@ footer{text-align:center;color:var(--mut);font-size:13px;padding:36px 20px;borde
 <p>중계에 쓸 PC의 <b>크롬(Chrome)</b>으로 아래 주소에 접속합니다. 즐겨찾기에 등록해 두세요.</p>
 <div class="url">https://hockeytv.github.io/scoreboard/</div>
 <p>설치할 프로그램은 없습니다. 이 주소로 접속한 화면이 <b>점수를 조작하는 화면</b>입니다.</p>
+<p>이 매뉴얼은 조작 화면 맨 위 <b>📖 사용 매뉴얼</b> 버튼으로 언제든 다시 열 수 있습니다.</p>
 <div class="box tip"><b>💡 두 개의 화면이 있습니다</b>
   <b>조작 화면</b>은 내가 보면서 버튼을 누르는 곳이고, <b>스코어버그</b>는 시청자에게 보이는 그래픽입니다. 조작 화면에서 누르면 스코어버그가 실시간으로 바뀝니다.
 </div>
@@ -107,6 +109,9 @@ footer{text-align:center;color:var(--mut);font-size:13px;padding:36px 20px;borde
   <b>위치·크기는 조작 화면에서</b> 바꾸세요 → 설정 → 보드 레이아웃(화면 위치·여백), 보드 외형(글자 크기).
 </div>
 <p>배경은 이미 투명하게 나오므로 사용자 정의 CSS는 건드릴 필요가 없습니다. 하단 스크롤 자막을 따로 쓰려면 <b>📋 OBS 티커 주소 복사</b>로 브라우저 소스를 하나 더 만드세요.</p>
+<div class="box tip"><b>💡 미리보기의 파란 테두리 = 실제 방송 화면</b>
+  조작 화면 위쪽 미리보기에서 <b>파란 테두리 안쪽이 1920×1080 화면</b>이고, 체크무늬는 투명(뒤 영상이 비치는) 영역입니다. 테두리 바깥의 어두운 부분은 화면 밖이라 방송에 나가지 않습니다. 미리보기에서 보이는 그대로 OBS에도 나옵니다.
+</div>
 
 <h2 id="s4"><span class="n">4</span> 경기 시작 전 준비</h2>
 <p>조작 화면 아래 <b>설정</b> 영역에서 준비합니다. 위쪽 <b>미리보기</b>가 실제 방송 화면과 똑같이 보이니, 미리보기를 보면서 맞추면 됩니다.</p>
@@ -127,8 +132,23 @@ footer{text-align:center;color:var(--mut);font-size:13px;padding:36px 20px;borde
 <ul>
   <li><b>보드 외형 → 제목 표시</b>를 켜고 대회명을 입력하면 스코어보드 위에 표시됩니다</li>
   <li><b>글자 크기</b> <code>+</code> <code>−</code> 로 스코어보드 전체 크기 조절</li>
-  <li><b>화면 위치</b>: 좌측 상단 / 중앙 상단 / 우측 상단 / 좌측 하단 / 중앙 하단 / 우측 하단</li>
+  <li><b>화면 위치</b>: 좌측 상단 / 중앙 상단 / 우측 상단 / 좌측 하단 / 중앙 하단 / 우측 하단 (기본: 좌측 상단)</li>
+  <li><b>화면 가장자리 여백</b>: 기본 40px</li>
+  <li><b>글꼴</b>: 영문·숫자용과 한글용을 따로 고를 수 있습니다 (기본: 검은고딕)</li>
 </ul>
+<h3>화면에 나오는 글자 언어</h3>
+<p><b>방송 화면에 나가는 글자는 기본이 영어</b>입니다. 조작 화면 버튼은 한글 그대로예요.</p>
+<table>
+  <tr><th>조작 화면 버튼</th><th>방송 화면 표시</th></tr>
+  <tr><td>엠티넷</td><td>Empty net</td></tr>
+  <tr><td>타임아웃</td><td>Timeout</td></tr>
+  <tr><td>파워플레이</td><td>POWER PLAY 2:00</td></tr>
+  <tr><td>리플레이 표시</td><td>REPLAY</td></tr>
+  <tr><td>득점 시</td><td>GOAL!</td></tr>
+  <tr><td>경기 종료 표시</td><td>FINAL</td></tr>
+</table>
+<p><b>팀 이름 · 제목 · 티커 문구 · 피리어드 이름</b>은 직접 입력한 그대로 나오므로 한글로 쓰시면 됩니다.</p>
+<p>방송 화면 글자도 한글로 바꾸려면 <b>설정 → 보드 외형 → 보드에 나오는 글자 언어</b>를 <code>한국어</code>로 바꾸세요.</p>
 <div class="box ok"><b>✔ 관리자가 설정을 배포했다면</b>
   <b>설정 → ⬇ 팀 설정 가져오기</b> 를 한 번 누르면 글꼴·색상·피리어드가 팀 표준으로 한 번에 맞춰집니다. 점수와 경기 기록은 각자 따로 유지됩니다.
 </div>
@@ -151,6 +171,20 @@ footer{text-align:center;color:var(--mut);font-size:13px;padding:36px 20px;borde
 <div class="box tip"><b>💡 메모를 남겨두세요</b>
   <b>경기 기록</b> 칸의 메모 입력란에 "골리 교체", "비디오 판독" 같은 내용을 적고 <kbd>Enter</kbd>를 누르면 그 시점 시계와 함께 저장됩니다. 나중에 하이라이트 편집할 때 유용합니다.
 </div>
+
+<h2 id="s5b"><span class="n">5-1</span> OBS 옆에 두고 쓰기 (창 배치)</h2>
+<p>보통 <b>왼쪽에 조작 화면, 오른쪽에 OBS</b>를 놓고 씁니다. 조작 화면은 창 너비에 맞춰 자동으로 정리됩니다.</p>
+<table>
+  <tr><th>창 너비</th><th>보이는 칸</th></tr>
+  <tr><td>약 650px 이상</td><td><b>4칸 전부</b> — 홈 · 어웨이 · 타이머 · 경기 상태</td></tr>
+  <tr><td>500 ~ 650px</td><td>3칸 (경기 상태는 아래로)</td></tr>
+  <tr><td>500px 미만</td><td>2칸</td></tr>
+</table>
+<div class="box tip"><b>💡 라이브 중에는 미리보기를 끄세요</b>
+  실제 화면은 OBS에서 보고 계시니, 미리보기 오른쪽 <b>숨기기</b>를 누르면 조작 버튼이 훨씬 많이 보입니다.
+  <b>숨긴 상태는 기억되어</b> 다음에 열 때도 그대로 시작합니다. 다시 보려면 같은 자리의 <b>보기</b>를 누르세요.
+</div>
+<p>창을 좁히면 버튼과 글자가 자동으로 작아져서 스크롤 없이 조작할 수 있습니다. 넓히면 원래 크기로 돌아옵니다.</p>
 
 <h2 id="s6"><span class="n">6</span> 페널티 넣고 빼기</h2>
 <h3>추가</h3>
@@ -210,6 +244,9 @@ footer{text-align:center;color:var(--mut);font-size:13px;padding:36px 20px;borde
   <tr><th>소리가 안 남</th><td>OBS 브라우저 소스 속성에서 <b>OBS를 통해 오디오 제어</b> 체크</td></tr>
   <tr><th>글꼴이 이상함</th><td>인터넷 연결 필요(웹폰트 사용). 새로고침 <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd> (맥: <kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd>)</td></tr>
   <tr><th>화면이 예전 버전 같음</th><td>강력 새로고침 <kbd>Ctrl</kbd>/<kbd>Cmd</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd></td></tr>
+  <tr><th>버튼 칸이 2개만 보임</th><td>창이 좁아서 그렇습니다. 창을 조금 넓히면 4칸이 됩니다. 미리보기 <b>숨기기</b>도 도움이 됩니다</td></tr>
+  <tr><th>미리보기에서 스코어보드가 가운데 떠 있는 것 같음</th><td>정상입니다. 파란 테두리 안쪽이 실제 화면이고, 스코어보드는 그 좌측 상단에 붙어 있습니다</td></tr>
+  <tr><th>페널티 시간이 안 맞음</th><td>페널티는 게임시계가 돌 때만 줄어듭니다. 시계가 멈춰 있지 않은지 확인하세요</td></tr>
 </table>
 
 <h2 id="s10"><span class="n">10</span> 꼭 지켜야 할 것</h2>
