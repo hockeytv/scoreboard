@@ -37,7 +37,7 @@ button{font-family:inherit}
 .section>.body{padding:12px}
 
 /* preview */
-#previewBody{background-color:#3a3a3a;background-image:linear-gradient(45deg,#4a4a4a 25%,transparent 25%),linear-gradient(-45deg,#4a4a4a 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#4a4a4a 75%),linear-gradient(-45deg,transparent 75%,#4a4a4a 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0;padding:16px;overflow:auto}
+#previewBody{background:#0d101c;padding:0;overflow:hidden}
 
 /* controls grid */
 .ctrlgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:10px}
@@ -181,6 +181,12 @@ table.logtbl tr:hover td{background:#1b2236}
 /* 1920x1080 fit stage */
 #displayRoot{position:fixed;inset:0;padding:0;margin:0;overflow:hidden}
 .fitstage{position:absolute;top:0;left:0;width:1920px;height:1080px;transform-origin:top left}
+.fitstage.preview{background-color:#3a3a3a;
+ background-image:linear-gradient(45deg,#4a4a4a 25%,transparent 25%),linear-gradient(-45deg,#4a4a4a 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#4a4a4a 75%),linear-gradient(-45deg,transparent 75%,#4a4a4a 75%);
+ background-size:40px 40px;background-position:0 0,0 20px,20px -20px,-20px 0;
+ box-shadow:0 0 0 4px rgba(120,150,255,.85),0 0 0 10px rgba(0,0,0,.35)}
+.canvaslabel{position:absolute;right:12px;bottom:8px;font-size:24px;font-weight:700;color:#ffffffb0;
+ font-family:system-ui,sans-serif;letter-spacing:.02em;pointer-events:none}
 .poswrap{position:absolute;inset:0;display:flex}
 .tickerhost{position:absolute;left:0;right:0;bottom:0}
 #previewBody{position:relative;overflow:hidden}
@@ -788,9 +794,10 @@ const memo={board:null,ticker:null};
 const CANVAS_W=1920,CANVAS_H=1080;
 function ensureHosts(root){
  if(root.querySelector("#fitStage"))return;
- root.innerHTML=`<div class="fitstage" id="fitStage">
+ root.innerHTML=`<div class="fitstage${IS_DISPLAY?"":" preview"}" id="fitStage">
    <div class="poswrap" id="posWrap"><div id="boardHost" class="stagewrap"><div id="boardInner"></div><div class="goalfx" id="goalfx"></div></div></div>
-   <div class="tickerhost" id="tickerHost"></div></div>`}
+   <div class="tickerhost" id="tickerHost"></div>
+   ${IS_DISPLAY?"":'<div class="canvaslabel">1920 &times; 1080 &nbsp;\u2014&nbsp; OBS 화면</div>'}</div>`}
 function layoutFit(root){
  const st=root.querySelector("#fitStage");if(!st)return;
  let cw,ch;
