@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HockeyTV Scoreboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Oswald:wght@400;500;600;700&family=Roboto+Condensed:wght@400;500;700&family=Bebas+Neue&family=Anton&family=Archivo+Black&family=Noto+Sans+KR:wght@400;500;700;900&family=Black+Han+Sans&family=Do+Hyeon&family=Jua&family=Gothic+A1:wght@400;500;700;800;900&family=Nanum+Gothic:wght@400;700;800&family=Song+Myung&display=swap" rel="stylesheet">
+<style>
+/* 무료 한글 웹폰트 (눈누 제공 CDN) */
+@font-face{font-family:'KotraBold';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_20-10-21@1.1/KOTRA_BOLD-Bold.woff') format('woff');font-weight:normal;font-display:swap}
+@font-face{font-family:'KotraDoYak';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2110@1.0/KOTRALEAP.woff2') format('woff2');font-weight:normal;font-display:swap}
+@font-face{font-family:'KotraHope';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2110@1.0/KOTRAHOPE.woff2') format('woff2');font-weight:normal;font-display:swap}
+@font-face{font-family:'JalnanGothic';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_231029@1.1/JalnanGothic.woff') format('woff');font-weight:normal;font-display:swap}
+@font-face{font-family:'Jalnan';src:url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_four@1.2/JalnanOTF00.woff') format('woff');font-weight:normal;font-display:swap}
+:root{
+  --bg:#171b26; --panel:#20263a; --panel2:#2a3350; --line:#39415f;
+  --txt:#e8ecf7; --muted:#9aa5c4; --accent:#6d5cf7; --ok:#18b884; --warn:#e0b020;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--txt);font-family:"Noto Sans KR",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px}
+body.viewmode{background:transparent!important;overflow:hidden}
+button{font-family:inherit}
+
+/* ============ CONTROL PANEL ============ */
+.topbar{display:flex;gap:8px;align-items:center;justify-content:center;padding:10px;background:#11151f;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.btn{background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:6px;padding:7px 12px;cursor:pointer;font-size:13px;font-weight:500}
+.btn:hover{filter:brightness(1.2)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:#04281d}
+.btn.sm{padding:4px 8px;font-size:12px}
+.btn.wide{width:100%}
+.roompill{font-size:12px;color:var(--muted);border:1px dashed var(--line);border-radius:20px;padding:5px 12px}
+
+.section{border:1px solid var(--line);margin:10px;border-radius:8px;overflow:hidden;background:var(--panel)}
+.section>h3{margin:0;padding:8px 12px;background:#1a2033;font-size:13px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
+.section>.body{padding:12px}
+
+/* preview */
+#previewBody{background-color:#3a3a3a;background-image:linear-gradient(45deg,#4a4a4a 25%,transparent 25%),linear-gradient(-45deg,#4a4a4a 25%,transparent 25%),linear-gradient(45deg,transparent 75%,#4a4a4a 75%),linear-gradient(-45deg,transparent 75%,#4a4a4a 75%);background-size:20px 20px;background-position:0 0,0 10px,10px -10px,-10px 0;padding:16px;overflow:auto}
+
+/* controls grid */
+.ctrlgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:10px}
+@media(max-width:1100px){.ctrlgrid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:640px){.ctrlgrid{grid-template-columns:1fr}}
+.cbox{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel)}
+.cbox>h4{margin:0;padding:6px;text-align:center;font-size:12px;font-weight:700;letter-spacing:.5px;background:#1a2033}
+.cbox>.b{padding:8px;display:flex;flex-direction:column;gap:6px}
+.cbox.home>h4{background:#131a33;color:#f5c518}
+.cbox.away>h4{background:#c01722;color:#fff}
+.tag{align-self:center;background:var(--accent);color:#fff;font-size:11px;font-weight:700;padding:2px 10px;border-radius:5px}
+.bigbtn{width:100%;padding:12px;font-size:16px;font-weight:700;border-radius:6px;border:1px solid var(--line);background:#e8ecf7;color:#111;cursor:pointer}
+.bigbtn:active{transform:translateY(1px)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.subbtn{padding:8px;font-size:13px;border-radius:6px;border:1px solid var(--line);background:#111624;color:var(--txt);cursor:pointer}
+.cbox.away .subbtn{background:#3d0b10}
+.clockbig{text-align:center;font-family:"Oswald",monospace;font-size:34px;font-weight:700;letter-spacing:2px;padding:4px 0}
+.penlist{display:flex;flex-direction:column;gap:4px}
+.penrow{display:flex;align-items:center;gap:4px;background:#2b1030;border:1px solid #5b2a63;border-radius:5px;padding:4px 6px;font-size:13px}
+.penrow b{font-family:"Oswald";font-size:15px}
+.penrow .sp{flex:1}
+.tog{width:100%;padding:9px;border-radius:6px;border:1px solid var(--line);background:#111624;color:var(--txt);cursor:pointer;font-size:13px;font-weight:600}
+.tog.on{background:var(--ok);color:#04281d;border-color:var(--ok)}
+
+/* setup */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+@media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr}}
+label.f{display:block;font-size:12px;color:var(--muted);margin:8px 0 3px}
+input[type=text],input[type=number],select,textarea{width:100%;background:#141a2b;border:1px solid var(--line);color:var(--txt);border-radius:6px;padding:8px;font-size:13px;font-family:inherit}
+input[type=color]{width:40px;height:32px;padding:2px;background:#141a2b;border:1px solid var(--line);border-radius:6px}
+.inline{display:flex;align-items:center;gap:8px}
+.sw{display:flex;align-items:center;gap:8px;margin:6px 0;font-size:13px;cursor:pointer;user-select:none}
+.sw input{display:none}
+.sw i{width:34px;height:18px;border-radius:20px;background:#404a6b;position:relative;transition:.15s;flex:0 0 auto}
+.sw i:after{content:'';position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:.15s}
+.sw input:checked + i{background:var(--accent)}
+.sw input:checked + i:after{left:18px}
+.hint{font-size:11px;color:var(--muted);line-height:1.5}
+.logoprev{width:38px;height:38px;object-fit:contain;background:#141a2b;border:1px solid var(--line);border-radius:6px}
+.periodrow{display:grid;grid-template-columns:28px 1fr 90px 30px;gap:6px;align-items:center;margin-bottom:6px}
+.copybox{display:flex;gap:6px;align-items:center;margin:4px 0}
+.copybox input{font-size:11px;font-family:monospace}
+.teamchip{display:flex;align-items:center;gap:6px;padding:5px;border:1px solid var(--line);border-radius:6px;background:#141a2b;margin-bottom:4px;font-size:12px}
+.teamchip img{width:22px;height:22px;object-fit:contain}
+.teamchip .sp{flex:1}
+
+/* ============ SCOREBOARD RENDER ============ */
+.sbwrap{display:inline-block;font-family:var(--sbfont,"Barlow Condensed"),"Noto Sans KR",sans-serif;line-height:1}
+.sbwrap.center{display:block;text-align:center}
+.sbwrap.center .sbmain,.sbwrap.center .sbunder{margin-left:auto;margin-right:auto}
+.sbgrid{display:inline-grid;grid-template-columns:minmax(min-content,1fr) minmax(min-content,1fr) auto;column-gap:2px;row-gap:2px}
+.sbside{display:flex;align-items:center;gap:.5em;padding:.28em .55em;min-width:8.2em;border-radius:3px}
+.sblogo{height:2.15em;width:2.15em;object-fit:contain;flex:0 0 auto}
+.sbnamecol{display:flex;flex-direction:column;justify-content:center;flex:1;min-width:0}
+.sbname{font-size:1.55em;font-weight:700;letter-spacing:.01em;white-space:nowrap;text-transform:uppercase}
+.sbrec{font-size:.92em;font-weight:700;opacity:.92;white-space:nowrap}
+.sbscorecol{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;padding-left:.35em}
+.sbscore{font-size:1.9em;font-weight:700;font-variant-numeric:tabular-nums}
+.sbsog{font-size:.82em;font-weight:700;white-space:nowrap;opacity:.95}
+.sbclock{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:.28em .6em;min-width:3.6em;border-radius:3px}
+.sbtime{font-size:1.9em;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:.02em}
+.sbperiod{font-size:.95em;font-weight:700;opacity:.95}
+.sbucol{display:flex;flex-direction:column;gap:2px}
+.sbbanner{text-align:center;font-size:1.05em;font-weight:700;padding:.16em .3em;border-radius:3px}
+.sbpen{text-align:center;font-size:1.35em;font-weight:700;padding:.06em;font-variant-numeric:tabular-nums;border-radius:3px}
+.sbtitle{text-align:center;font-size:1.15em;font-weight:700;padding:.18em .9em;border-radius:3px;grid-column:1/4;justify-self:center}
+.sbso{display:flex;align-items:center;justify-content:space-between;gap:.4em;padding:.14em .5em;border-radius:3px}
+.sbso .dots{display:flex;align-items:center;gap:.22em}
+.sbso .dot{width:.8em;height:.8em;border-radius:50%;background:#c9c9c9;flex:0 0 auto}
+.sbso .socount{font-size:1.35em;font-weight:700;font-variant-numeric:tabular-nums}
+.stripe{background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.10) 0 8px,transparent 8px 16px)}
+
+/* full screen board */
+.fsb{display:flex;flex-direction:column;align-items:center;gap:.3em;font-family:var(--sbfont,"Barlow Condensed"),sans-serif}
+.fsbrow{display:flex;align-items:center;gap:.5em}
+.fsbteam{display:flex;flex-direction:column;align-items:center;padding:.3em .6em;border-radius:6px;min-width:5.5em}
+.fsbteam .n{font-size:2em;font-weight:700;text-transform:uppercase}
+.fsbteam .s{font-size:6em;font-weight:700;line-height:.95;font-variant-numeric:tabular-nums}
+.fsbmid{display:flex;flex-direction:column;align-items:center}
+.fsbmid .t{font-size:4.4em;font-weight:700;font-variant-numeric:tabular-nums}
+.fsbmid .p{font-size:1.5em;font-weight:700}
+
+/* goal animation */
+@keyframes blinkdot{0%,100%{opacity:1}50%{opacity:.15}}
+.sbreplay{display:flex;align-items:center;justify-content:center;gap:.45em;font-size:1.15em;font-weight:700;
+ padding:.18em 1em;border-radius:3px;grid-column:1/4;justify-self:center;letter-spacing:.08em;text-transform:uppercase}
+.sbreplay i{width:.6em;height:.6em;border-radius:50%;background:currentColor;animation:blinkdot 1s infinite;font-style:normal}
+.sbgrid.dimmed>*:not(.sbreplay){opacity:.3;transition:opacity .25s}
+@keyframes goalflash{0%{opacity:0;transform:scale(.85)}8%{opacity:1;transform:scale(1.03)}16%{transform:scale(1)}82%{opacity:1}100%{opacity:0}}
+@keyframes goalpulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.35)}}
+.goalfx{position:absolute;inset:0;display:flex;align-items:stretch;justify-content:center;pointer-events:none;z-index:9;overflow:hidden}
+.goalfx span{flex:1;display:flex;align-items:center;justify-content:center;gap:.4em;font-family:var(--sbfont,"Barlow Condensed"),"Noto Sans KR",sans-serif;font-weight:700;letter-spacing:.06em;border-radius:4px;animation:goalflash 2.6s ease-out forwards,goalpulse .5s ease-in-out 6;text-shadow:0 3px 14px rgba(0,0,0,.55);white-space:nowrap;text-transform:uppercase}
+.stagewrap{position:relative;display:inline-block}
+.sbwrap.center + .goalfx,.stagewrap.center{display:block}
+
+/* ticker */
+.tickerbar{overflow:hidden;white-space:nowrap;font-family:var(--sbfont,"Barlow Condensed"),"Noto Sans KR",sans-serif;font-weight:700;padding:.35em 0;width:100%}
+.tickerbar .tk{display:inline-block;padding-left:100%;animation:tkscroll linear infinite}
+@keyframes tkscroll{0%{transform:translateX(0)}100%{transform:translateX(-100%)}}
+
+/* game log */
+.logwrap{max-height:300px;overflow:auto;border:1px solid var(--line);border-radius:6px;background:#141a2b}
+table.logtbl{width:100%;border-collapse:collapse;font-size:12.5px}
+table.logtbl th{position:sticky;top:0;background:#1a2033;color:var(--muted);font-weight:700;padding:6px 8px;text-align:left;border-bottom:1px solid var(--line);white-space:nowrap}
+table.logtbl td{padding:5px 8px;border-bottom:1px solid #2a3350;vertical-align:middle}
+table.logtbl tr:hover td{background:#1b2236}
+.logtbl .gc{font-family:"Oswald",monospace;font-weight:700;white-space:nowrap}
+.logtbl .pd{color:var(--muted);white-space:nowrap}
+.logtbl .ty{white-space:nowrap;font-weight:700}
+.logtbl .del{cursor:pointer;color:#8b93ad;border:none;background:none;font-size:14px}
+.logtbl .del:hover{color:#ff6b6b}
+.logempty{padding:24px;text-align:center;color:var(--muted);font-size:13px}
+/* view mode containers */
+#displayRoot{position:fixed;inset:0;padding:0;margin:0}
+#displayRoot.pos-tl{display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:4px}
+.sbwrap,.sbwrap *,.fsb,.fsb *,.tickerbar,.tickerbar *,.goalfx span,.goalfx span *{font-weight:var(--sbw,400)}
+#audioNotice{position:fixed;left:8px;bottom:8px;background:#000a;color:#fff;padding:6px 10px;border-radius:6px;font-size:12px;font-family:sans-serif;cursor:pointer;z-index:99}
+</style>
+</head>
+<body>
+
+<!-- =================== DISPLAY (OBS) =================== -->
+<div id="displayRoot" class="pos-tl" style="display:none"></div>
+
+<!-- =================== CONTROL PANEL =================== -->
+<div id="controlRoot">
+
+  <div class="topbar">
+    <button class="btn pri" id="btnOpenDisplay">🔴 <span data-i18n="openDisplay"></span></button>
+    <button class="btn" id="btnCopyBug">📋 <span data-i18n="copyBug"></span></button>
+    <button class="btn" id="btnCopyTicker">📋 <span data-i18n="copyTicker"></span></button>
+    <button class="btn" id="btnResetAll">↺ <span data-i18n="resetGame"></span></button>
+    <span class="roompill" id="roomPill"></span>
+    <button class="btn sm" id="btnLang">한 / EN</button>
+  </div>
+
+  <div class="section">
+    <h3><span data-i18n="preview"></span><button class="btn sm" id="btnTogglePrev" data-i18n="hide"></button></h3>
+    <div class="body" id="previewBody" style="padding:16px"><div id="previewStage"></div></div>
+  </div>
+
+  <div class="ctrlgrid">
+    <!-- HOME -->
+    <div class="cbox home"><h4 id="ctlHomeName">HOME</h4><div class="b">
+      <span class="tag"><span data-i18n="score"></span>: <b id="hScoreTag">0</b></span>
+      <button class="bigbtn" data-act="score" data-team="home" data-d="1">+1</button>
+      <div class="row2"><button class="subbtn" data-act="score" data-team="home" data-d="-1">-1</button><button class="subbtn" data-act="scorereset" data-team="home">↺ <span data-i18n="reset"></span></button></div>
+      <span class="tag"><span data-i18n="sog"></span>: <b id="hSogTag">0</b></span>
+      <button class="bigbtn" data-act="sog" data-team="home" data-d="1">+1</button>
+      <div class="row2"><button class="subbtn" data-act="sog" data-team="home" data-d="-1">-1</button><button class="subbtn" data-act="sogreset" data-team="home">↺ <span data-i18n="reset"></span></button></div>
+      <button class="bigbtn" data-act="addpen" data-team="home" data-i18n="addPenalty"></button>
+      <span class="tag" data-i18n="activePenalties"></span>
+      <div class="penlist" id="hPenList"></div>
+      <button class="tog" data-act="en" data-team="home" id="hEnBtn" data-i18n="emptyNet"></button>
+      <button class="tog" data-act="to" data-team="home" id="hToBtn" data-i18n="timeout"></button>
+    </div></div>
+
+    <!-- AWAY -->
+    <div class="cbox away"><h4 id="ctlAwayName">AWAY</h4><div class="b">
+      <span class="tag"><span data-i18n="score"></span>: <b id="aScoreTag">0</b></span>
+      <button class="bigbtn" data-act="score" data-team="away" data-d="1">+1</button>
+      <div class="row2"><button class="subbtn" data-act="score" data-team="away" data-d="-1">-1</button><button class="subbtn" data-act="scorereset" data-team="away">↺ <span data-i18n="reset"></span></button></div>
+      <span class="tag"><span data-i18n="sog"></span>: <b id="aSogTag">0</b></span>
+      <button class="bigbtn" data-act="sog" data-team="away" data-d="1">+1</button>
+      <div class="row2"><button class="subbtn" data-act="sog" data-team="away" data-d="-1">-1</button><button class="subbtn" data-act="sogreset" data-team="away">↺ <span data-i18n="reset"></span></button></div>
+      <button class="bigbtn" data-act="addpen" data-team="away" data-i18n="addPenalty"></button>
+      <span class="tag" data-i18n="activePenalties"></span>
+      <div class="penlist" id="aPenList"></div>
+      <button class="tog" data-act="en" data-team="away" id="aEnBtn" data-i18n="emptyNet"></button>
+      <button class="tog" data-act="to" data-team="away" id="aToBtn" data-i18n="timeout"></button>
+    </div></div>
+
+    <!-- TIMER -->
+    <div class="cbox"><h4 data-i18n="timerBuzzer"></h4><div class="b">
+      <div class="clockbig" id="ctlClock">20:00</div>
+      <div class="row2">
+        <button class="subbtn" data-act="clock" data-d="1">+1</button>
+        <button class="subbtn" data-act="clock" data-d="60">+60</button>
+        <button class="subbtn" data-act="clock" data-d="-1">-1</button>
+        <button class="subbtn" data-act="clock" data-d="-60">-60</button>
+      </div>
+      <button class="bigbtn" id="btnStart" style="background:var(--ok);color:#04281d" data-i18n="start"></button>
+      <button class="subbtn" data-act="clockreset" data-i18n="reset"></button>
+      <button class="subbtn" data-act="buzzer" data-i18n="buzzer"></button>
+      <button class="subbtn" data-act="horn" data-i18n="goalHorn"></button>
+      <div class="hint" data-i18n="timerHint"></div>
+    </div></div>
+
+    <!-- STATUS -->
+    <div class="cbox"><h4 data-i18n="gameStatus"></h4><div class="b">
+      <span class="tag"><span data-i18n="period"></span>: <b id="periodTag">1st</b></span>
+      <div class="row2"><button class="subbtn" data-act="period" data-d="1">+1</button><button class="subbtn" data-act="period" data-d="-1">-1</button></div>
+      <button class="tog" data-act="final" id="finalBtn" data-i18n="finalOff"></button>
+      <button class="subbtn" data-act="periodreset" data-i18n="reset"></button>
+      <hr style="border:none;border-top:1px solid var(--line);margin:4px 0">
+      <button class="tog" data-act="ticker" id="tickerBtn" data-i18n="tickerToggle"></button>
+      <label class="f" data-i18n="tickerText"></label>
+      <textarea id="tickerText" rows="2"></textarea>
+      <hr style="border:none;border-top:1px solid var(--line);margin:4px 0">
+      <button class="tog" data-act="replay" id="replayBtn" data-i18n="replayMode"></button>
+      <div class="hint" data-i18n="replayHint"></div>
+      <hr style="border:none;border-top:1px solid var(--line);margin:4px 0">
+      <button class="tog" data-act="shootout" id="shootoutBtn" data-i18n="shootoutMode"></button>
+      <div id="shootoutBox" style="display:none"></div>
+    </div></div>
+  </div>
+
+  <div class="section"><h3><span data-i18n="gameLog"></span><span><button class="btn sm" id="logCsv" data-i18n="exportCsv"></button>
+    <button class="btn sm" id="logTxt" data-i18n="exportTxt"></button>
+    <button class="btn sm" id="logJson" data-i18n="exportJson"></button>
+    <button class="btn sm" id="logClear" data-i18n="clearLog"></button></span></h3><div class="body">
+    <div class="inline" style="margin-bottom:8px">
+      <input type="text" id="noteText" data-i18n-ph="notePh">
+      <button class="btn sm" id="noteAdd" data-i18n="addNote"></button>
+      <label class="sw" style="margin:0;white-space:nowrap"><input type="checkbox" id="logClockOpt"><i></i><span data-i18n="logClock"></span></label>
+    </div>
+    <div class="logwrap" id="logWrap"></div>
+  </div></div>
+
+  <!-- =================== SETUP =================== -->
+  <div class="section"><h3><span data-i18n="setup"></span></h3><div class="body">
+
+    <div class="grid2">
+      <div class="section" style="margin:0"><h3><span data-i18n="homeTeam"></span><button class="btn sm" id="btnFlip" data-i18n="flip"></button></h3><div class="body" data-team="home">
+        <label class="f" data-i18n="teamName"></label><input type="text" data-f="name">
+        <label class="f" data-i18n="teamRecord"></label><input type="text" data-f="rec">
+        <div class="grid2"><div><label class="f" data-i18n="bgColor"></label><div class="inline"><input type="color" data-f="bg"><input type="text" data-f="bgt"></div></div>
+        <div><label class="f" data-i18n="txtColor"></label><div class="inline"><input type="color" data-f="fg"><input type="text" data-f="fgt"></div></div></div>
+        <label class="f" data-i18n="teamLogo"></label>
+        <div class="inline"><img class="logoprev" data-f="logoprev"><input type="file" accept="image/*" data-f="logofile" style="font-size:11px"><button class="btn sm" data-f="logodel" data-i18n="delete"></button></div>
+        <div class="inline" style="margin-top:6px"><span class="hint" data-i18n="logoSize"></span><button class="btn sm" data-f="logominus">−</button><button class="btn sm" data-f="logoplus">+</button><button class="btn sm" data-f="logoreset" data-i18n="reset"></button></div>
+        <div class="row2" style="margin-top:8px"><button class="btn sm" data-f="saveteam" data-i18n="saveTeam"></button><button class="btn sm" data-f="loadteam" data-i18n="browseTeams"></button></div>
+        <div data-f="teamlist" style="margin-top:6px;display:none"></div>
+      </div></div>
+
+      <div class="section" style="margin:0"><h3><span data-i18n="awayTeam"></span></h3><div class="body" data-team="away">
+        <label class="f" data-i18n="teamName"></label><input type="text" data-f="name">
+        <label class="f" data-i18n="teamRecord"></label><input type="text" data-f="rec">
+        <div class="grid2"><div><label class="f" data-i18n="bgColor"></label><div class="inline"><input type="color" data-f="bg"><input type="text" data-f="bgt"></div></div>
+        <div><label class="f" data-i18n="txtColor"></label><div class="inline"><input type="color" data-f="fg"><input type="text" data-f="fgt"></div></div></div>
+        <label class="f" data-i18n="teamLogo"></label>
+        <div class="inline"><img class="logoprev" data-f="logoprev"><input type="file" accept="image/*" data-f="logofile" style="font-size:11px"><button class="btn sm" data-f="logodel" data-i18n="delete"></button></div>
+        <div class="inline" style="margin-top:6px"><span class="hint" data-i18n="logoSize"></span><button class="btn sm" data-f="logominus">−</button><button class="btn sm" data-f="logoplus">+</button><button class="btn sm" data-f="logoreset" data-i18n="reset"></button></div>
+        <div class="row2" style="margin-top:8px"><button class="btn sm" data-f="saveteam" data-i18n="saveTeam"></button><button class="btn sm" data-f="loadteam" data-i18n="browseTeams"></button></div>
+        <div data-f="teamlist" style="margin-top:6px;display:none"></div>
+      </div></div>
+    </div>
+
+    <div class="section" style="margin:12px 0 0"><h3><span data-i18n="boardLayout"></span></h3><div class="body grid2">
+      <div>
+        <label class="sw"><input type="radio" name="layout" value="bug"><i></i><span data-i18n="layBug"></span></label>
+        <label class="sw"><input type="radio" name="layout" value="bugc"><i></i><span data-i18n="layBugC"></span></label>
+        <label class="sw"><input type="radio" name="layout" value="full"><i></i><span data-i18n="layFull"></span></label>
+      </div>
+      <div class="hint" data-i18n="layoutHint"></div>
+    </div></div>
+
+    <div class="section" style="margin:12px 0 0"><h3><span data-i18n="boardAppearance"></span></h3><div class="body grid3">
+      <div>
+        <label class="f" data-i18n="boardBg"></label><div class="inline"><input type="color" id="boardBg"><input type="text" id="boardBgT"></div>
+        <label class="f" data-i18n="boardTxt"></label><div class="inline"><input type="color" id="boardFg"><input type="text" id="boardFgT"></div>
+        <label class="f" data-i18n="font"></label>
+        <select id="fontSel"></select>
+        <label class="f" data-i18n="fontKR"></label>
+        <select id="fontKRSel"></select>
+        <label class="f" data-i18n="fontWeight"></label>
+        <select id="fontWeightSel">
+          <option value="400">보통 Regular</option>
+          <option value="500">중간 Medium</option>
+          <option value="700">굵게 Bold</option>
+          <option value="900">아주 굵게 Black</option>
+        </select>
+        <div class="hint" data-i18n="fontHint"></div>
+        <label class="f" data-i18n="customFont"></label>
+        <input type="text" id="customFontUrl" placeholder="https://.../myfont.woff2">
+        <div class="hint" data-i18n="customFontHint"></div>
+        <label class="f" data-i18n="fontSize"></label>
+        <div class="inline"><button class="btn sm" id="fsMinus">−</button><span id="fsVal">100%</span><button class="btn sm" id="fsPlus">+</button><button class="btn sm" id="fsReset" data-i18n="reset"></button></div>
+      </div>
+      <div>
+        <label class="sw"><input type="checkbox" id="showTitle"><i></i><span data-i18n="showTitle"></span></label>
+        <input type="text" id="titleText" placeholder="2026 KHL Final">
+        <label class="f" data-i18n="titleBg"></label><div class="inline"><input type="color" id="titleBg"><input type="text" id="titleBgT"></div>
+        <label class="f" data-i18n="titleTxt"></label><div class="inline"><input type="color" id="titleFg"><input type="text" id="titleFgT"></div>
+      </div>
+      <div>
+        <label class="sw"><input type="checkbox" id="optPeriod"><i></i><span data-i18n="optPeriod"></span></label>
+        <label class="sw"><input type="checkbox" id="optSOG"><i></i><span data-i18n="optSOG"></span></label>
+        <label class="sw"><input type="checkbox" id="optRec"><i></i><span data-i18n="optRec"></span></label>
+        <label class="sw"><input type="checkbox" id="optPenTop"><i></i><span data-i18n="optPenTop"></span></label>
+        <label class="sw"><input type="checkbox" id="optPP"><i></i><span data-i18n="optPP"></span></label>
+        <label class="sw"><input type="checkbox" id="optGoalH"><i></i><span data-i18n="optGoalH"></span></label>
+        <label class="sw"><input type="checkbox" id="optGoalA"><i></i><span data-i18n="optGoalA"></span></label>
+        <label class="sw"><input type="checkbox" id="optReplayDim"><i></i><span data-i18n="replayHide"></span></label>
+      </div>
+    </div></div>
+
+    <div class="section" style="margin:12px 0 0"><h3><span data-i18n="timerSettings"></span></h3><div class="body grid3">
+      <div>
+        <label class="sw"><input type="checkbox" id="showTimer"><i></i><span data-i18n="showTimer"></span></label>
+        <label class="sw"><input type="checkbox" id="countUp"><i></i><span data-i18n="countUp"></span></label>
+        <label class="sw"><input type="checkbox" id="autoBuzz"><i></i><span data-i18n="autoBuzz"></span></label>
+        <label class="sw"><input type="checkbox" id="penFreeze"><i></i><span data-i18n="penFreeze"></span></label>
+      </div>
+      <div style="grid-column:span 2">
+        <label class="f" data-i18n="periods"></label>
+        <div id="periodEditor"></div>
+        <button class="btn sm" id="addPeriod" data-i18n="addPeriod"></button>
+        <div class="hint" style="margin-top:6px" data-i18n="periodHint"></div>
+      </div>
+    </div></div>
+
+    <div class="section" style="margin:12px 0 0"><h3><span data-i18n="audioTicker"></span></h3><div class="body grid3">
+      <div>
+        <label class="sw"><input type="checkbox" id="audioOn"><i></i><span data-i18n="audioOn"></span></label>
+        <label class="sw"><input type="checkbox" id="hornOn"><i></i><span data-i18n="hornOn"></span></label>
+        <label class="f" data-i18n="customHorn"></label>
+        <input type="file" accept="audio/*" id="hornFile" style="font-size:11px">
+        <button class="btn sm" id="hornDel" data-i18n="delete"></button>
+        <div class="hint" data-i18n="hornHint"></div>
+      </div>
+      <div>
+        <label class="f" data-i18n="tickerSpeed"></label><input type="number" id="tickerSpeed" min="5" max="120">
+        <label class="f" data-i18n="tickerBg"></label><div class="inline"><input type="color" id="tickerBg"><input type="text" id="tickerBgT"></div>
+        <label class="f" data-i18n="tickerFg"></label><div class="inline"><input type="color" id="tickerFg"><input type="text" id="tickerFgT"></div>
+      </div>
+      <div>
+        <label class="f" data-i18n="obsUrls"></label>
+        <div class="copybox"><input type="text" id="urlBug" readonly><button class="btn sm" data-copy="urlBug">복사</button></div>
+        <div class="copybox"><input type="text" id="urlTicker" readonly><button class="btn sm" data-copy="urlTicker">복사</button></div>
+        <label class="f" data-i18n="roomCode"></label>
+        <div class="inline"><input type="text" id="roomCode"><button class="btn sm" id="roomNew" data-i18n="newRoom"></button></div>
+        <div class="hint" data-i18n="roomHint"></div>
+        <div style="margin-top:8px" class="row2"><button class="btn sm" id="btnExport" data-i18n="exportCfg"></button><button class="btn sm" id="btnImport" data-i18n="importCfg"></button></div>
+        <input type="file" accept="application/json" id="importFile" style="display:none">
+      </div>
+    </div></div>
+
+  </div></div>
+  <div style="height:30px"></div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/mqtt@5.10.1/dist/mqtt.min.js"></script>
+<script>
+/* ================= i18n ================= */
+const I18N={
+ko:{openDisplay:"디스플레이 열기",copyBug:"OBS 스코어버그 주소 복사",copyTicker:"OBS 티커 주소 복사",resetGame:"경기 초기화",
+preview:"스코어보드 미리보기",hide:"숨기기",show:"보기",score:"점수",sog:"유효슛(SOG)",reset:"리셋",addPenalty:"페널티 추가",
+activePenalties:"진행 중 페널티",emptyNet:"엠티넷",timeout:"타임아웃",timerBuzzer:"타이머 / 부저",start:"시작",pause:"일시정지",
+buzzer:"부저",goalHorn:"골혼 재생",timerHint:"페널티는 게임시계가 돌 때 함께 줄어듭니다. 스페이스바로 시작/정지.",
+gameStatus:"경기 상태",period:"피리어드",finalOff:"경기 종료 표시: 꺼짐",finalOn:"경기 종료 표시: 켜짐",
+tickerToggle:"하단 티커 표시",tickerText:"티커 문구",shootoutMode:"승부치기(슛아웃) 모드",
+setup:"설정",homeTeam:"홈 팀",awayTeam:"어웨이 팀",flip:"홈/어웨이 바꾸기",teamName:"팀 이름",teamRecord:"전적 / 순위",
+bgColor:"배경색",txtColor:"글자색",teamLogo:"팀 로고",delete:"삭제",logoSize:"로고 크기",saveTeam:"현재 팀 저장",browseTeams:"저장된 팀 불러오기",
+boardLayout:"보드 레이아웃",layBug:"스코어버그: 가로로 길게 (스트리밍용)",layBugC:"스코어버그: 화면 중앙 정렬",layFull:"스코어보드: 전체화면",
+layoutHint:"OBS 브라우저 소스에는 '스코어버그'를 쓰세요. 배경이 투명하게 나옵니다.\n소스 크기는 폭 1280 / 높이 260 정도로 시작하면 좋습니다.",
+boardAppearance:"보드 외형",boardBg:"보드 배경색",boardTxt:"보드 글자색",font:"영문·숫자 글꼴",fontSize:"글자 크기",
+showTitle:"제목 표시",titleBg:"제목 배경색",titleTxt:"제목 글자색",
+optPeriod:"피리어드 표시",optSOG:"SOG 표시",optRec:"전적/순위 표시",optPenTop:"페널티를 위쪽에 배치",optPP:"개별 페널티 대신 '파워플레이' 표시",
+optGoalH:"홈 팀 골 애니메이션",optGoalA:"어웨이 팀 골 애니메이션",
+timerSettings:"타이머 설정",showTimer:"타이머 표시",countUp:"시간이 올라가게 (기본: 내려감)",autoBuzz:"0초에 자동 부저",penRealtime:"페널티를 게임시계와 무관하게 진행",
+periods:"피리어드 구성 (이름 / 길이)",addPeriod:"+ 피리어드 추가",periodHint:"대회마다 다른 피리어드 수·시간을 여기서 자유롭게 설정하세요. 시계가 멈춰 있을 때 피리어드를 바꾸면 시간이 자동으로 맞춰집니다.",
+audioTicker:"사운드 · 티커 · OBS 주소",audioOn:"디스플레이에서 소리 켜기",hornOn:"골 애니메이션과 함께 골혼 재생",
+customHorn:"내 골혼 파일 (mp3, 1MB 이하)",hornHint:"파일을 넣지 않으면 내장 신디사이저 골혼이 재생됩니다.",
+tickerSpeed:"티커 속도(초, 낮을수록 빠름)",tickerBg:"티커 배경색",tickerFg:"티커 글자색",
+obsUrls:"OBS 브라우저 소스 주소",roomCode:"동기화 코드 (Room)",newRoom:"새로 만들기",
+roomHint:"OBS와 조작 화면이 이 코드로 연결됩니다. 이 코드를 아는 사람만 내 보드를 볼 수 있으니 공유하지 마세요.",
+exportCfg:"설정 내보내기",importCfg:"설정 불러오기",goal:"골!",powerplay:"파워플레이",finalTxt:"경기 종료",shootout:"SO",
+fontKR:"한글 글꼴",fontHint:"두 목록에 모든 글꼴이 들어 있습니다. 위는 영문·숫자, 아래는 한글에 적용되고, 위에서 \"↑ 한글 글꼴과 동일하게\"를 고르면 전체가 한 글꼴로 통일됩니다. 코트라·잘난체·검은고딕처럼 굵기가 하나뿐인 글꼴은 굵기를 바꿔도 그대로 나옵니다.",
+fontWeight:"글자 굵기",customFont:"직접 추가할 웹폰트 주소 (woff / woff2)",customFontHint:"눈누(noonnu.cc)에서 원하는 글꼴의 웹폰트 코드에 있는 url만 복사해 붙여넣으면 두 목록 맨 아래 '직접 추가한 글꼴'로 나타납니다.",
+soHit:"성공",soMiss:"실패",soUndo:"↩ 되돌리기",soReset:"슛아웃 초기화",soRoundLabel:"슛아웃 · 라운드",
+replayMode:"🔴 리플레이 표시 (R)",replay:"리플레이",replayHide:"리플레이 중 점수판 흐리게",replayHint:"OBS의 '다시보기 버퍼'와 같이 씁니다. 설정법은 사용법 문서 9번을 보세요.",
+gameLog:"경기 기록",logTime:"시간",logPeriod:"P",logType:"종류",logTeam:"팀",logDetail:"내용",
+addNote:"메모 추가",notePh:"예: 골리 교체 / 비디오 판독",clearLog:"기록 전체 삭제",
+exportCsv:"⬇ CSV (엑셀)",exportTxt:"⬇ 경기 요약 (txt)",exportJson:"⬇ JSON",logClock:"시계 시작·정지도 기록",
+noLog:"아직 기록이 없습니다. 점수·페널티를 입력하면 자동으로 쌓입니다.",
+evGoal:"골",evGoalCancel:"골 취소",evPen:"페널티",evPenEnd:"페널티 종료",evPeriod:"피리어드",evFinal:"경기 종료",
+evTimeout:"타임아웃",evEN:"엠티넷",evENoff:"엠티넷 해제",evSoHit:"슛아웃 성공",evSoMiss:"슛아웃 실패",
+evNote:"메모",evStart:"시계 시작",evStop:"시계 정지",evReset:"경기 초기화",
+sumScore:"최종 스코어",sumSOG:"유효슛",sumGoals:"득점",sumPens:"페널티",sumSO:"슛아웃",sumNotes:"메모",logCleared:"기록을 지웠습니다."},
+en:{openDisplay:"Open Display",copyBug:"Copy scorebug URL",copyTicker:"Copy ticker URL",resetGame:"Reset game",
+preview:"Scoreboard preview",hide:"Hide",show:"Show",score:"Score",sog:"SOG",reset:"Reset",addPenalty:"Add penalty",
+activePenalties:"Active penalties",emptyNet:"Empty net",timeout:"Timeout",timerBuzzer:"Timer and Buzzer",start:"Start",pause:"Pause",
+buzzer:"Buzzer",goalHorn:"Goal horn",timerHint:"Penalties tick down with the game clock. Press Space to start/stop.",
+gameStatus:"Game Status",period:"Period",finalOff:"Final: Off",finalOn:"Final: On",
+tickerToggle:"Show bottom ticker",tickerText:"Ticker text",shootoutMode:"Penalty shootout mode",
+setup:"Setup",homeTeam:"Home team",awayTeam:"Away team",flip:"Flip home/away",teamName:"Team name",teamRecord:"Record / ranking",
+bgColor:"Background",txtColor:"Text",teamLogo:"Team logo",delete:"Delete",logoSize:"Logo size",saveTeam:"Save current team",browseTeams:"Browse saved teams",
+boardLayout:"Board Layout",layBug:"Scorebug: narrow and wide",layBugC:"Scorebug: narrow and centered",layFull:"Scoreboard: full screen",
+layoutHint:"Use the scorebug for OBS browser sources — the background is transparent.\nStart with a source size of about 1280 x 260.",
+boardAppearance:"Board appearance",boardBg:"Board background",boardTxt:"Board text",font:"Latin / number font",fontSize:"Font size",
+showTitle:"Show a title",titleBg:"Title background",titleTxt:"Title text",
+optPeriod:'Show period',optSOG:'Show "SOG"',optRec:"Show team records",optPenTop:"Penalties on top",optPP:'Show "Power play" instead of penalties',
+optGoalH:"Goal animation for Home",optGoalA:"Goal animation for Away",
+timerSettings:"Timer settings",showTimer:"Show timer",countUp:"Timer counts up",autoBuzz:"Auto buzzer at 0",penRealtime:"Penalties run independently of clock",
+periods:"Periods (name / length)",addPeriod:"+ Add period",periodHint:"Set any number of periods and lengths. Changing period while stopped resets the clock to that period's length.",
+audioTicker:"Audio · Ticker · OBS URLs",audioOn:"Enable audio on display",hornOn:"Play goal horn with animation",
+customHorn:"Custom horn file (mp3, under 1MB)",hornHint:"Without a file, a built-in synthesized horn is used.",
+tickerSpeed:"Ticker speed (sec, lower = faster)",tickerBg:"Ticker background",tickerFg:"Ticker text",
+obsUrls:"OBS browser source URLs",roomCode:"Sync code (Room)",newRoom:"New",
+roomHint:"OBS and this control page are linked by this code. Keep it private.",
+exportCfg:"Export settings",importCfg:"Import settings",goal:"GOAL!",powerplay:"POWER PLAY",finalTxt:"FINAL",shootout:"SO",
+fontKR:"Korean font",fontHint:"Latin and numbers use the font above; Korean the one below. Single-weight display fonts ignore the weight setting.",
+fontWeight:"Font weight",customFont:"Custom webfont URL (woff / woff2)",customFontHint:"Paste a direct font file URL; it appears as 'Custom font' at the bottom of both lists.",
+soHit:"Hit",soMiss:"Miss",soUndo:"↩ Undo",soReset:"Reset shootout",soRoundLabel:"SHOOTOUT · ROUND",
+replayMode:"🔴 Replay tag (R)",replay:"REPLAY",replayHide:"Dim the board during replay",replayHint:"Use together with the OBS Replay Buffer — see section 9 of the guide.",
+gameLog:"Game log",logTime:"Time",logPeriod:"P",logType:"Event",logTeam:"Team",logDetail:"Detail",
+addNote:"Add note",notePh:"e.g. goalie change / video review",clearLog:"Clear all",
+exportCsv:"⬇ CSV",exportTxt:"⬇ Summary (txt)",exportJson:"⬇ JSON",logClock:"Also log clock start/stop",
+noLog:"No entries yet. Scores and penalties are recorded automatically.",
+evGoal:"Goal",evGoalCancel:"Goal cancelled",evPen:"Penalty",evPenEnd:"Penalty ended",evPeriod:"Period",evFinal:"Final",
+evTimeout:"Timeout",evEN:"Empty net",evENoff:"Empty net off",evSoHit:"SO hit",evSoMiss:"SO miss",
+evNote:"Note",evStart:"Clock start",evStop:"Clock stop",evReset:"Game reset",
+sumScore:"Final score",sumSOG:"Shots on goal",sumGoals:"Goals",sumPens:"Penalties",sumSO:"Shootout",sumNotes:"Notes",logCleared:"Log cleared."}};
+let LANG="ko";
+const t=k=>(I18N[LANG][k]||I18N.en[k]||k);
+
+/* ================= state ================= */
+const DEF_PERIODS=[{n:"1st",len:"20:00"},{n:"2nd",len:"20:00"},{n:"3rd",len:"20:00"},{n:"OT",len:"5:00"},{n:"SO",len:"0:00"}];
+function team(n,bg,fg){return{name:n,rec:"",bg,fg,logo:null,logoSize:100}}
+function liveTeam(){return{score:0,sog:0,pen:[],en:false,to:false,so:[]}}
+const DEFAULT={
+ cfg:{home:team("HOME","#131a33","#f5c518"),away:team("AWAY","#c01722","#ffffff"),
+  board:{layout:"bug",bg:"#131a33",fg:"#ffffff",font:"__same",fontKR:"Black Han Sans",customUrl:"",weight:400,scale:100,
+   showTitle:false,title:"",titleBg:"#131a33",titleFg:"#ffffff",
+   showPeriod:true,showSOG:true,showRec:true,penTop:false,pp:false,goalH:true,goalA:true,replayDim:true},
+  timer:{show:true,countUp:false,autoBuzz:false,penRealtime:false},
+  periods:JSON.parse(JSON.stringify(DEF_PERIODS)),
+  ticker:{text:"",speed:25,bg:"#131a33",fg:"#ffffff"},
+  audio:{on:true,horn:true,data:null},logClock:false,lang:"ko",fv:3},
+ live:{home:liveTeam(),away:liveTeam(),clock:{ms:1200000,running:false,at:0},
+  pIdx:0,final:false,tickerOn:false,shootout:false,replay:false,fx:{buzz:0,horn:0},rev:0}};
+let S=JSON.parse(JSON.stringify(DEFAULT));
+S.log=[];
+
+/* ================= helpers ================= */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const now=()=>Date.now();
+function parseTime(str){if(typeof str==="number")return str;const p=String(str).trim().split(":");
+ if(p.length===2)return (parseInt(p[0]||0)*60+parseFloat(p[1]||0))*1000;return (parseFloat(p[0]||0))*1000}
+function fmt(ms,tenths){if(ms<0)ms=0;const total=ms/1000;
+ if(tenths&&total>0&&total<60)return (Math.floor(total*10)/10).toFixed(1);
+ const m=Math.floor(total/60),s=Math.floor(total%60);return m+":"+String(s).padStart(2,"0")}
+function esc(s){return String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function rid(){return Math.random().toString(36).slice(2,8)}
+
+/* clock */
+function clockLive(){const c=S.live.clock;let ms=c.ms;
+ if(c.running){const el=now()-c.at;ms=S.cfg.timer.countUp?ms+el:ms-el}
+ return Math.max(0,ms)}
+function clockCommit(){const c=S.live.clock;c.ms=clockLive();c.at=now()}
+function penLive(p){
+ if(S.cfg.timer.penRealtime)return Math.max(0,p.ms-(now()-(p.at||now())));
+ const c=S.live.clock;return Math.max(0,p.ms-(c.running?now()-c.at:0))}
+function penCommit(){["home","away"].forEach(k=>S.live[k].pen.forEach(p=>{p.ms=penLive(p);p.at=now()}))}
+function activePen(k){return S.live[k].pen.filter(p=>penLive(p)>0)}
+
+/* ================= sync ================= */
+const P=new URLSearchParams(location.search);
+const VIEW=P.get("view")||"";
+const IS_DISPLAY=VIEW==="bug"||VIEW==="ticker"||VIEW==="full";
+let ROOM=P.get("room")||localStorage.getItem("htv_room")||("htv"+rid()+rid());
+if(!P.get("room"))localStorage.setItem("htv_room",ROOM);
+const TOPIC=n=>"hockeytv/sb/"+ROOM+"/"+n;
+let bc=null;try{bc=new BroadcastChannel("htv_sb_"+ROOM)}catch(e){}
+const BROKERS=["wss://broker.emqx.io:8084/mqtt","wss://broker.hivemq.com:8884/mqtt","wss://test.mosquitto.org:8081/mqtt"];
+let mq=null,mqReady=false,bIdx=0,connTries=0;
+function initMQ(){
+ if(!window.mqtt){setNet(false,"no-lib");return}
+ const url=BROKERS[bIdx%BROKERS.length];
+ try{
+  if(mq){try{mq.end(true)}catch(e){}}
+  mq=mqtt.connect(url,{clientId:"htv_"+rid()+rid(),reconnectPeriod:0,connectTimeout:7000,clean:true,keepalive:30});
+  mq.on("connect",()=>{mqReady=true;connTries=0;setNet(true);
+   if(IS_DISPLAY){mq.subscribe(TOPIC("cfg"),{qos:0});mq.subscribe(TOPIC("live"),{qos:0})}
+   else{pubCfg();pubLive()}});
+  const retry=()=>{mqReady=false;setNet(false);
+   connTries++;if(connTries%2===0)bIdx++;
+   setTimeout(initMQ,Math.min(15000,2000*connTries))};
+  mq.on("close",retry);mq.on("error",()=>{});
+  mq.on("message",(tp,pl)=>{if(!IS_DISPLAY)return;
+   try{const d=JSON.parse(pl.toString());
+    if(tp.endsWith("/cfg")){S.cfg=d;applyCfgToDisplay()}else{S.live=d}
+    renderAll()}catch(e){}});
+ }catch(e){setTimeout(()=>{bIdx++;initMQ()},3000)}
+}
+function setNet(ok,why){const el=$("#roomPill");if(!el)return;
+ el.innerHTML=(ok?"🟢":"🟠")+" "+(why==="no-lib"?"오프라인(동기화 라이브러리 로드 실패)":ROOM.slice(0,10))}
+let pubT=null;
+function pubLive(){if(IS_DISPLAY)return;S.live.rev++;
+ const s=JSON.stringify(S.live);
+ if(bc)try{bc.postMessage({k:"live",d:s})}catch(e){}
+ if(mq&&mqReady)mq.publish(TOPIC("live"),s,{retain:true,qos:0});
+ saveLocal()}
+function pubCfg(){if(IS_DISPLAY)return;
+ const s=JSON.stringify(S.cfg);
+ if(bc)try{bc.postMessage({k:"cfg",d:s})}catch(e){}
+ if(mq&&mqReady)mq.publish(TOPIC("cfg"),s,{retain:true,qos:0});
+ saveLocal()}
+function push(){pubLive();renderAll()}
+function pushCfg(){pubCfg();renderAll()}
+if(bc)bc.onmessage=e=>{if(!IS_DISPLAY)return;const {k,d}=e.data||{};
+ if(k==="cfg"){S.cfg=JSON.parse(d);applyCfgToDisplay()}else if(k==="live"){S.live=JSON.parse(d)}renderAll()};
+
+function saveLocal(){try{localStorage.setItem("htv_state",JSON.stringify(S))}catch(e){}}
+function loadLocal(){try{const r=localStorage.getItem("htv_state");if(!r)return;
+ const d=JSON.parse(r);S.cfg=Object.assign(S.cfg,d.cfg||{});
+ if(((d.cfg||{}).fv|0)<3){S.cfg.board.font="__same";S.cfg.board.fontKR="Black Han Sans";S.cfg.board.weight=400;S.cfg.fv=3}
+ if(d.live){S.live=Object.assign(S.live,d.live);S.live.clock.running=false}
+ if(Array.isArray(d.log))S.log=d.log;
+ LANG=S.cfg.lang||"ko"}catch(e){}}
+
+/* ================= audio ================= */
+let AC=null,userGesture=false;
+function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}
+ if(AC&&AC.state==="suspended")AC.resume();return AC}
+function tone(freqs,dur,type,vol){const c=ac();if(!c)return;const t0=c.currentTime;
+ const g=c.createGain();g.gain.setValueAtTime(0,t0);g.gain.linearRampToValueAtTime(vol,t0+.05);
+ g.gain.setValueAtTime(vol,t0+dur-.25);g.gain.linearRampToValueAtTime(0,t0+dur);g.connect(c.destination);
+ freqs.forEach(f=>{const o=c.createOscillator();o.type=type;o.frequency.setValueAtTime(f,t0);o.connect(g);o.start(t0);o.stop(t0+dur)})}
+let hornAudio=null;
+function playHorn(){
+ if(S.cfg.audio.data){try{hornAudio=hornAudio||new Audio();hornAudio.src=S.cfg.audio.data;hornAudio.currentTime=0;hornAudio.play().catch(()=>{});return}catch(e){}}
+ tone([98,147,196,247],2.6,"sawtooth",.16)}
+function playBuzz(){tone([180,181,270],1.8,"square",.14)}
+
+/* ================= render ================= */
+function fontStack(){const b=S.cfg.board;const kr=b.fontKR||"Black Han Sans";
+ const f1=(!b.font||b.font==="__same")?kr:b.font;return `'${f1}','${kr}'`}
+function applyCustomFont(){const u=(S.cfg.board.customUrl||"").trim();
+ let el=document.getElementById("customFontFace");
+ if(!el){el=document.createElement("style");el.id="customFontFace";document.head.appendChild(el)}
+ const css=u?`@font-face{font-family:'CustomFont';src:url('${u.replace(/'/g,"")}');font-display:swap}`:"";
+ if(el.textContent!==css)el.textContent=css}
+function periodName(){const p=S.cfg.periods[S.live.pIdx];return p?p.n:String(S.live.pIdx+1)}
+function ppState(){const h=activePen("home").length,a=activePen("away").length;
+ if(h>a)return "away";if(a>h)return "home";return null}
+
+function sideHTML(k,row){const c=S.cfg[k],l=S.live[k],b=S.cfg.board;
+ const gc=k==="home"?1:2;
+ const logo=c.logo?`<img class="sblogo" style="height:${2.15*(c.logoSize/100)}em;width:${2.15*(c.logoSize/100)}em" src="${c.logo}">`:"";
+ const rec=(b.showRec&&c.rec)?`<div class="sbrec">(${esc(c.rec)})</div>`:"";
+ const sog=b.showSOG?`<div class="sbsog">${t("sog")==="SOG"?"SOG":"SOG"} ${l.sog}</div>`:"";
+ return `<div class="sbside" style="background:${c.bg};color:${c.fg};grid-row:${row};grid-column:${gc}">
+   ${logo}<div class="sbnamecol"><div class="sbname">${esc(c.name)}</div>${rec}</div>
+   <div class="sbscorecol"><div class="sbscore">${l.score}</div>${sog}</div></div>`}
+
+function soRound(){return Math.max(1,S.live.home.so.length,S.live.away.so.length)}
+function soHTML(k){const c=S.cfg[k],l=S.live[k];
+ const n=Math.max(3,l.so.length);let dots="";
+ for(let i=0;i<n;i++){const v=l.so[i];
+  const st=v==="hit"?`background:${c.fg}`:v==="miss"?`background:transparent;box-shadow:inset 0 0 0 .16em ${c.fg}`:"background:#c9c9c9";
+  dots+=`<span class="dot" style="${st}"></span>`}
+ const hits=l.so.filter(x=>x==="hit").length;
+ return `<div class="sbso" style="background:${c.bg}cc;color:${c.fg}"><span class="dots">${dots}</span><b class="socount">${hits}</b></div>`}
+
+function underHTML(k,row){const c=S.cfg[k],l=S.live[k],b=S.cfg.board;let h="";
+ if(S.live.shootout)h+=soHTML(k);
+ if(l.en)h+=`<div class="sbbanner" style="background:${c.bg}cc;color:${c.fg}">${t("emptyNet")}</div>`;
+ if(l.to)h+=`<div class="sbbanner stripe" style="background:${c.bg}cc;color:${c.fg}">${t("timeout")}</div>`;
+ const pens=activePen(k);
+ const pen1=p=>`<div class="sbpen" style="background:${c.bg}cc;color:${c.fg}">${esc(p.num)} &nbsp;-&nbsp; ${fmt(penLive(p))}</div>`;
+ if(b.pp){
+  const opp=k==="home"?"away":"home",oppPens=activePen(opp);
+  if(oppPens.length>pens.length){
+   const soonest=Math.min(...oppPens.map(penLive));
+   h+=`<div class="sbpen" style="background:${c.bg}cc;color:${c.fg}">${t("powerplay")} ${fmt(soonest)}</div>`}
+ }else h+=pens.map(pen1).join("");
+ return `<div class="sbucol" style="grid-row:${row};grid-column:${k==="home"?1:2}">${h}</div>`}
+
+function bugHTML(){const b=S.cfg.board,tm=S.cfg.timer,L=S.live;
+ const hasTitle=!!(b.showTitle&&b.title), hasSO=!!L.shootout, hasRep=!!L.replay;
+ // row order: [replay] then (default) title→so→main→under  |  (penTop) so→under→main→title
+ let r=1; const R={};
+ if(hasRep)R.rep=r++;
+ if(b.penTop){if(hasSO)R.so=r++;R.under=r++;R.main=r++;if(hasTitle)R.title=r++}
+ else{if(hasTitle)R.title=r++;if(hasSO)R.so=r++;R.main=r++;R.under=r++}
+ const clockBox=tm.show?`<div class="sbclock" style="background:${b.bg};color:${b.fg};grid-row:${R.main};grid-column:3">
+   <div class="sbtime">${L.final?t("finalTxt"):fmt(clockLive(),true)}</div>
+   ${b.showPeriod?`<div class="sbperiod">${L.shootout?t("shootout"):esc(periodName())}</div>`:""}</div>`:"";
+ const title=hasTitle?`<div class="sbtitle" style="background:${b.titleBg};color:${b.titleFg};grid-row:${R.title}">${esc(b.title)}</div>`:"";
+ const sobar=hasSO?`<div class="sbtitle" style="background:${b.bg};color:${b.fg};grid-row:${R.so}">${t("soRoundLabel")}: ${soRound()}</div>`:"";
+ const repbar=hasRep?`<div class="sbreplay" style="background:#c81622;color:#fff;grid-row:${R.rep}"><i></i>${t("replay")}</div>`:"";
+ const dim=(hasRep&&b.replayDim!==false)?" dimmed":"";
+ const grid=`<div class="sbgrid${dim}">${repbar}${sideHTML("home",R.main)}${sideHTML("away",R.main)}${clockBox}${underHTML("home",R.under)}${underHTML("away",R.under)}${title}${sobar}</div>`;
+ return `<div class="sbwrap${b.layout==="bugc"?" center":""}" style="--sbfont:${fontStack()};--sbw:${b.weight||400};font-size:${30*b.scale/100}px">${grid}</div>`}
+
+function fullHTML(){const b=S.cfg.board,tm=S.cfg.timer;
+ const T=k=>{const c=S.cfg[k],l=S.live[k];return `<div class="fsbteam" style="background:${c.bg};color:${c.fg}">
+   <div class="n">${esc(c.name)}</div><div class="s">${l.score}</div>
+   ${b.showSOG?`<div class="sbsog">SOG ${l.sog}</div>`:""}</div>`};
+ const pens=["home","away"].map(k=>activePen(k).map(p=>`<span style="color:${S.cfg[k].fg};background:${S.cfg[k].bg};padding:.1em .4em;border-radius:4px;margin:0 .2em">${esc(p.num)} ${fmt(penLive(p))}</span>`).join("")).join("");
+ return `<div class="fsb" style="--sbfont:${fontStack()};--sbw:${b.weight||400};font-size:${18*b.scale/100}px;background:${b.bg};color:${b.fg};padding:.6em 1em;border-radius:8px">
+  ${b.showTitle&&b.title?`<div style="font-size:1.6em;font-weight:700">${esc(b.title)}</div>`:""}
+  <div class="fsbrow">${T("home")}<div class="fsbmid"><div class="t">${S.live.final?t("finalTxt"):fmt(clockLive(),true)}</div><div class="p">${esc(periodName())}</div></div>${T("away")}</div>
+  <div style="font-size:1.2em;font-weight:700">${pens}</div></div>`}
+
+function tickerHTML(){const k=S.cfg.ticker;const txt=(k.text||"").trim();
+ if(!S.live.tickerOn||!txt)return "";
+ return `<div class="tickerbar" style="background:${k.bg};color:${k.fg};font-size:${28*S.cfg.board.scale/100}px;--sbfont:${fontStack()};--sbw:${S.cfg.board.weight||400}">
+  <span class="tk" style="animation-duration:${k.speed}s">${esc(txt)}</span></div>`}
+
+function boardHTML(){return S.cfg.board.layout==="full"?fullHTML():bugHTML()}
+
+let lastScore={home:0,away:0},fxSeen={buzz:0,horn:0},initedFx=false;
+const memo={board:null,ticker:null};
+function ensureHosts(root){
+ if(root.querySelector("#boardHost"))return;
+ root.innerHTML=`<div id="boardHost" class="stagewrap"><div id="boardInner"></div><div class="goalfx" id="goalfx"></div></div><div id="tickerHost" style="width:100%"></div>`}
+function paint(root){
+ ensureHosts(root);
+ const bh=VIEW==="ticker"?"":boardHTML();
+ if(bh!==memo.board){memo.board=bh;root.querySelector("#boardInner").innerHTML=bh}
+ const th=tickerHTML();
+ if(th!==memo.ticker){memo.ticker=th;root.querySelector("#tickerHost").innerHTML=th}
+}
+function renderAll(){
+ applyCustomFont();
+ if(IS_DISPLAY){paint($("#displayRoot"));checkFx()}
+ else{const p=$("#previewStage");if(p)paint(p);updateControls()}
+}
+function checkFx(){
+ const b=S.cfg.board;
+ if(!initedFx){lastScore.home=S.live.home.score;lastScore.away=S.live.away.score;fxSeen={...S.live.fx};initedFx=true;return}
+ ["home","away"].forEach(k=>{
+  if(S.live[k].score>lastScore[k]){
+   const en=k==="home"?b.goalH:b.goalA;
+   if(en)goalAnim(k);
+   if(S.cfg.audio.on&&S.cfg.audio.horn&&en)playHorn();
+  }
+  lastScore[k]=S.live[k].score});
+ if(S.live.fx.horn!==fxSeen.horn){if(S.cfg.audio.on)playHorn();fxSeen.horn=S.live.fx.horn}
+ if(S.live.fx.buzz!==fxSeen.buzz){if(S.cfg.audio.on)playBuzz();fxSeen.buzz=S.live.fx.buzz}
+}
+function goalAnim(k){const el=$("#goalfx");if(!el)return;const c=S.cfg[k],b=S.cfg.board;
+ const px=30*b.scale/100;
+ el.innerHTML=`<span style="--sbfont:${fontStack()};--sbw:${b.weight||400};background:${c.bg}f2;color:${c.fg};font-size:${px*1.7}px">
+   ${c.logo?`<img src="${c.logo}" style="height:1.5em;width:1.5em;object-fit:contain">`:""}
+   <b style="font-size:.85em">${esc(c.name)}</b><b>${t("goal")}</b></span>`;
+ clearTimeout(goalAnim._t);goalAnim._t=setTimeout(()=>{const e=$("#goalfx");if(e)e.innerHTML=""},2700)}
+function applyCfgToDisplay(){LANG=S.cfg.lang||"ko";document.documentElement.lang=LANG}
+
+/* ================= control UI ================= */
+function updateControls(){
+ $("#ctlHomeName").textContent=S.cfg.home.name;$("#ctlAwayName").textContent=S.cfg.away.name;
+ $("#hScoreTag").textContent=S.live.home.score;$("#aScoreTag").textContent=S.live.away.score;
+ $("#hSogTag").textContent=S.live.home.sog;$("#aSogTag").textContent=S.live.away.sog;
+ $("#ctlClock").textContent=fmt(clockLive(),true);
+ $("#btnStart").textContent=S.live.clock.running?t("pause"):t("start");
+ $("#btnStart").style.background=S.live.clock.running?"#e0b020":"var(--ok)";
+ $("#periodTag").textContent=periodName();
+ $("#finalBtn").textContent=S.live.final?t("finalOn"):t("finalOff");
+ $("#finalBtn").classList.toggle("on",S.live.final);
+ $("#tickerBtn").classList.toggle("on",S.live.tickerOn);
+ $("#shootoutBtn").classList.toggle("on",S.live.shootout);
+ $("#replayBtn").classList.toggle("on",S.live.replay);
+ const sb=$("#shootoutBox");
+ if(S.live.shootout){
+  const line=k=>{const l=S.live[k],hits=l.so.filter(x=>x==="hit").length;
+   return `<span class="tag" style="background:${S.cfg[k].bg};color:${S.cfg[k].fg}">${esc(S.cfg[k].name)} &nbsp;${hits} / ${l.so.length}</span>
+   <div class="row2"><button class="subbtn" style="background:#0d4a35" data-so="hit" data-team="${k}">✔ ${t("soHit")}</button>
+   <button class="subbtn" style="background:#4a1414" data-so="miss" data-team="${k}">✖ ${t("soMiss")}</button></div>
+   <button class="subbtn" data-so="undo" data-team="${k}">${t("soUndo")}</button>`};
+  const html=`<div style="display:flex;flex-direction:column;gap:5px;margin-top:6px">
+   <span class="tag">${t("soRoundLabel")}: ${soRound()}</span>${line("home")}${line("away")}
+   <button class="subbtn" data-so="reset">${t("soReset")}</button></div>`;
+  if(sb.dataset.h!==html){sb.dataset.h=html;sb.innerHTML=html}
+  sb.style.display="block";
+ }else if(sb.style.display!=="none"){sb.style.display="none";sb.dataset.h=""}
+ ["home","away"].forEach(k=>{const pre=k==="home"?"h":"a";
+  $("#"+pre+"EnBtn").classList.toggle("on",S.live[k].en);
+  $("#"+pre+"ToBtn").classList.toggle("on",S.live[k].to);
+  const list=$("#"+pre+"PenList");
+  list.innerHTML=S.live[k].pen.map(p=>`<div class="penrow"><b>${esc(p.num)}</b><span class="sp"></span><b>${fmt(penLive(p))}</b>
+   <button class="btn sm" data-pen="+" data-team="${k}" data-id="${p.id}">+30</button>
+   <button class="btn sm" data-pen="-" data-team="${k}" data-id="${p.id}">-30</button>
+   <button class="btn sm" data-pen="x" data-team="${k}" data-id="${p.id}">✕</button></div>`).join("")});
+}
+function applyI18N(){$$("[data-i18n]").forEach(e=>{const k=e.getAttribute("data-i18n");if(I18N[LANG][k])e.textContent=I18N[LANG][k]});
+ $$("[data-i18n-ph]").forEach(e=>{const k=e.getAttribute("data-i18n-ph");if(I18N[LANG][k])e.placeholder=I18N[LANG][k]});
+ logMemo="";renderLog();
+ $("#penFreeze")&&$("#penFreeze").parentElement.querySelector("span")&&($("#penFreeze").parentElement.querySelector("span").textContent=t("penRealtime"));
+ document.documentElement.lang=LANG}
+
+/* ---- game log ---- */
+function logEv(type,team,detail){
+ S.log.push({ts:now(),gc:Math.round(clockLive()),p:S.live.pIdx,type,team:team||"",detail:detail||""});
+ if(S.log.length>3000)S.log.shift();
+ saveLocal();renderLog()}
+function evName(t){return I18N[LANG]["ev"+t.charAt(0).toUpperCase()+t.slice(1)]||t}
+function teamName(k){return k?(S.cfg[k]?S.cfg[k].name:k):""}
+function pName(i){const p=S.cfg.periods[i];return p?p.n:String(i+1)}
+function wallTime(ts){const d=new Date(ts);return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")+":"+String(d.getSeconds()).padStart(2,"0")}
+let logMemo="";
+function renderLog(){
+ const w=$("#logWrap");if(!w)return;
+ if(!S.log.length){const h='<div class="logempty">'+t("noLog")+'</div>';
+  if(logMemo!==h){logMemo=h;w.innerHTML=h}return}
+ const rows=S.log.map((e,i)=>`<tr><td class="gc">${fmt(e.gc)}</td><td class="pd">${esc(pName(e.p))}</td>
+  <td class="ty">${esc(evName(e.type))}</td><td>${esc(teamName(e.team))}</td><td>${esc(e.detail)}</td>
+  <td class="pd">${wallTime(e.ts)}</td><td><button class="del" data-logdel="${i}">✕</button></td></tr>`).reverse().join("");
+ const h=`<table class="logtbl"><thead><tr><th>${t("logTime")}</th><th>${t("logPeriod")}</th><th>${t("logType")}</th>
+  <th>${t("logTeam")}</th><th>${t("logDetail")}</th><th>⏱</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
+ if(logMemo!==h){logMemo=h;w.innerHTML=h}}
+
+function logFileBase(){const d=new Date();
+ const ymd=d.getFullYear()+String(d.getMonth()+1).padStart(2,"0")+String(d.getDate()).padStart(2,"0");
+ const clean=x=>String(x||"").replace(/[\\/:*?"<>|]/g,"").trim()||"team";
+ return `${ymd}_${clean(S.cfg.home.name)}_vs_${clean(S.cfg.away.name)}`}
+function dl(name,text,mime){
+ const blob=new Blob([text],{type:(mime||"text/plain")+";charset=utf-8"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=name;a.style.display="none";
+ document.body.appendChild(a);a.click();
+ setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},3000)}
+function exportCSV(){
+ const q=v=>'"'+String(v==null?"":v).replace(/"/g,'""')+'"';
+ const head=[t("logPeriod"),t("logTime"),t("logType"),t("logTeam"),t("logDetail"),"실제시각"].map(q).join(",");
+ const body=S.log.map(e=>[pName(e.p),fmt(e.gc),evName(e.type),teamName(e.team),e.detail,wallTime(e.ts)].map(q).join(",")).join("\n");
+ dl(logFileBase()+".csv","\ufeff"+head+"\n"+body,"text/csv")}
+function exportTXT(){
+ const H=S.cfg.home.name,A=S.cfg.away.name,L=S.live;
+ const g=S.log.filter(e=>e.type==="goal"),pn=S.log.filter(e=>e.type==="pen"),
+       so=S.log.filter(e=>e.type==="soHit"||e.type==="soMiss"),nt=S.log.filter(e=>e.type==="note");
+ const line=e=>`  ${pName(e.p).padEnd(4," ")} ${fmt(e.gc).padStart(5," ")}  ${teamName(e.team)}  ${e.detail}`;
+ let o=`${H}  vs  ${A}\n${new Date().toLocaleString()}\n${"=".repeat(46)}\n`;
+ o+=`${t("sumScore")}: ${L.home.score} - ${L.away.score}\n${t("sumSOG")}: ${L.home.sog} - ${L.away.sog}\n`;
+ if(g.length){o+=`\n[${t("sumGoals")}]\n`+g.map(line).join("\n")+"\n"}
+ if(pn.length){o+=`\n[${t("sumPens")}]\n`+pn.map(line).join("\n")+"\n"}
+ if(so.length){const hit=k=>so.filter(e=>e.team===k&&e.type==="soHit").length,tot=k=>so.filter(e=>e.team===k).length;
+  o+=`\n[${t("sumSO")}]\n  ${H} ${hit("home")}/${tot("home")}   ${A} ${hit("away")}/${tot("away")}\n`}
+ if(nt.length){o+=`\n[${t("sumNotes")}]\n`+nt.map(line).join("\n")+"\n"}
+ dl(logFileBase()+".txt",o)}
+function exportJSON(){
+ dl(logFileBase()+".json",JSON.stringify({home:S.cfg.home.name,away:S.cfg.away.name,
+  score:[S.live.home.score,S.live.away.score],sog:[S.live.home.sog,S.live.away.sog],
+  periods:S.cfg.periods,log:S.log},null,1),"application/json")}
+
+/* ---- actions ---- */
+function act(a,k,d,ev){
+ switch(a){
+  case "score":{const before=S.live[k].score;S.live[k].score=Math.max(0,before+d);
+    if(S.live[k].score!==before)logEv(d>0?"goal":"goalCancel",k,`${S.live.home.score}-${S.live.away.score}`);break}
+  case "scorereset":S.live[k].score=0;break;
+  case "sog":S.live[k].sog=Math.max(0,S.live[k].sog+d);break;
+  case "sogreset":S.live[k].sog=0;break;
+  case "addpen":addPenalty(k);return;
+  case "en":S.live[k].en=!S.live[k].en;logEv(S.live[k].en?"eN":"eNoff",k,"");break;
+  case "to":S.live[k].to=!S.live[k].to;if(S.live[k].to)logEv("timeout",k,"");break;
+  case "clock":{clockCommit();penCommit();S.live.clock.ms=Math.max(0,S.live.clock.ms+d*1000);break}
+  case "clockreset":{S.live.clock.running=false;const p=S.cfg.periods[S.live.pIdx];
+    S.live.clock.ms=S.cfg.timer.countUp?0:parseTime(p?p.len:"20:00");S.live.clock.at=now();break}
+  case "buzzer":S.live.fx.buzz++;if(!IS_DISPLAY&&S.cfg.audio.on)playBuzz();break;
+  case "horn":S.live.fx.horn++;if(!IS_DISPLAY&&S.cfg.audio.on)playHorn();break;
+  case "period":{clockCommit();penCommit();
+    const ni=Math.max(0,Math.min(S.cfg.periods.length-1,S.live.pIdx+d));S.live.pIdx=ni;
+    if(!S.live.clock.running){const p=S.cfg.periods[ni];S.live.clock.ms=S.cfg.timer.countUp?0:parseTime(p.len);S.live.clock.at=now()}
+    logEv("period","",pName(ni));break}
+  case "periodreset":{S.live.pIdx=0;S.live.clock.running=false;
+    S.live.clock.ms=S.cfg.timer.countUp?0:parseTime(S.cfg.periods[0].len);S.live.clock.at=now();S.live.final=false;break}
+  case "final":S.live.final=!S.live.final;if(S.live.final)logEv("final","",`${S.live.home.score}-${S.live.away.score}`);break;
+  case "ticker":S.live.tickerOn=!S.live.tickerOn;break;
+  case "replay":S.live.replay=!S.live.replay;break;
+  case "shootout":{S.live.shootout=!S.live.shootout;
+    if(S.live.shootout){const i=S.cfg.periods.findIndex(p=>/^(so|shootout|슛|승부)/i.test(p.n));
+     if(i>=0){S.live.pIdx=i;if(!S.live.clock.running){S.live.clock.ms=S.cfg.timer.countUp?0:parseTime(S.cfg.periods[i].len);S.live.clock.at=now()}}}
+    break}
+ }
+ push()}
+
+function addPenalty(k){
+ const num=prompt(LANG==="ko"?"선수 번호 (예: 11)":"Player number (e.g. 11)","");
+ if(num===null)return;
+ const mn=prompt(LANG==="ko"?"페널티 시간 (분:초, 예: 2:00)":"Penalty time (m:ss)","2:00");
+ if(mn===null)return;
+ const ms=parseTime(mn);if(!ms)return;
+ penCommit();
+ S.live[k].pen.push({id:rid(),num:String(num).trim(),ms,at:now()});
+ logEv("pen",k,`#${String(num).trim()}  ${fmt(ms)}`);
+ push()}
+
+function toggleClock(){
+ if(S.live.clock.running){clockCommit();penCommit();S.live.clock.running=false;
+  if(S.cfg.logClock)logEv("stop","","")}
+ else{S.live.clock.ms=clockLive();S.live.clock.at=now();S.live.clock.running=true;
+  if(S.cfg.logClock)logEv("start","","")}
+ push()}
+
+/* ---- tick loop ---- */
+let buzzedAt=-1;
+setInterval(()=>{
+ if(!IS_DISPLAY){
+  // expire penalties
+  let changed=false;
+  ["home","away"].forEach(k=>{const gone=S.live[k].pen.filter(p=>penLive(p)<=0);
+   if(gone.length){S.live[k].pen=S.live[k].pen.filter(p=>penLive(p)>0);
+    gone.forEach(p=>logEv("penEnd",k,"#"+p.num));changed=true}});
+  const c=S.live.clock;
+  if(c.running&&!S.cfg.timer.countUp&&clockLive()<=0){c.running=false;c.ms=0;
+   if(S.cfg.timer.autoBuzz&&buzzedAt!==S.live.pIdx){S.live.fx.buzz++;buzzedAt=S.live.pIdx;if(S.cfg.audio.on)playBuzz()}
+   changed=true}
+  if(changed)pubLive();
+  if(S.live.clock.running||S.live.home.pen.length||S.live.away.pen.length)pubLiveThrottled();
+ }
+ renderAll();
+},100);
+let lastPub=0;
+function pubLiveThrottled(){if(now()-lastPub>1500){lastPub=now();pubLive()}}
+
+/* ================= boot ================= */
+function boot(){
+ if(IS_DISPLAY){
+  document.body.classList.add("viewmode");
+  $("#controlRoot").style.display="none";
+  $("#displayRoot").style.display="flex";
+  if(VIEW==="full")S.cfg.board.layout="full";
+  loadLocal();
+  initMQ();renderAll();
+  document.addEventListener("click",()=>{ac();userGesture=true},{once:true});
+  return;
+ }
+ loadLocal();applyI18N();bindControls();bindSetup();fillSetup();renderLog();initMQ();setNet(false);renderAll();
+ setTimeout(()=>{pubCfg();pubLive()},1200);
+}
+
+function bindControls(){
+ document.addEventListener("click",e=>{
+  const b=e.target.closest("[data-act]");
+  if(b){ac();act(b.dataset.act,b.dataset.team,parseInt(b.dataset.d||0));return}
+  const p=e.target.closest("[data-pen]");
+  if(p){penCommit();const arr=S.live[p.dataset.team].pen;const i=arr.findIndex(x=>x.id===p.dataset.id);
+   if(i<0)return;
+   if(p.dataset.pen==="x")arr.splice(i,1);
+   else arr[i].ms=Math.max(0,arr[i].ms+(p.dataset.pen==="+"?30000:-30000));
+   push();return}
+  const so=e.target.closest("[data-so]");
+  if(so){const a=so.dataset.so,k=so.dataset.team;
+   if(a==="reset"){S.live.home.so=[];S.live.away.so=[]}
+   else if(a==="undo")S.live[k].so.pop();
+   else{S.live[k].so.push(a);logEv(a==="hit"?"soHit":"soMiss",k,`R${soRound()}`)}
+   push();return}
+  const cp=e.target.closest("[data-copy]");
+  if(cp){const el=$("#"+cp.dataset.copy);el.select();document.execCommand("copy");cp.textContent="✓";setTimeout(()=>cp.textContent=LANG==="ko"?"복사":"Copy",1200)}
+ });
+ $("#btnStart").onclick=()=>{ac();toggleClock()};
+ $("#btnLang").onclick=()=>{LANG=LANG==="ko"?"en":"ko";S.cfg.lang=LANG;applyI18N();fillSetup();pushCfg()};
+ $("#btnOpenDisplay").onclick=()=>window.open(urlFor("bug"),"_blank","width=1320,height=320");
+ $("#btnCopyBug").onclick=()=>copyTxt(urlFor("bug"),$("#btnCopyBug"));
+ $("#btnCopyTicker").onclick=()=>copyTxt(urlFor("ticker"),$("#btnCopyTicker"));
+ $("#btnResetAll").onclick=()=>{if(!confirm(LANG==="ko"?"점수·SOG·페널티·시계를 모두 초기화할까요? (팀 설정은 유지)":"Reset scores, SOG, penalties and clock?"))return;
+  S.live=JSON.parse(JSON.stringify(DEFAULT.live));
+  S.live.clock.ms=parseTime(S.cfg.periods[0].len);
+  if(S.log.length&&confirm(LANG==="ko"?"이전 경기 기록도 지울까요?\n[취소]를 누르면 기록은 그대로 남습니다.":"Clear the game log as well?")){S.log=[];logMemo=""}
+  else if(S.log.length)logEv("reset","","");
+  renderLog();push()};
+ $("#btnTogglePrev").onclick=()=>{const b=$("#previewBody");const h=b.style.display==="none";
+  b.style.display=h?"block":"none";$("#btnTogglePrev").textContent=h?t("hide"):t("show")};
+ $("#tickerText").oninput=e=>{S.cfg.ticker.text=e.target.value;pushCfg()};
+ $("#logCsv").onclick=()=>{if(S.log.length)exportCSV()};
+ $("#logTxt").onclick=exportTXT;
+ $("#logJson").onclick=exportJSON;
+ $("#logClear").onclick=()=>{if(!S.log.length)return;
+  if(!confirm(LANG==="ko"?"경기 기록을 모두 지울까요? 되돌릴 수 없습니다.":"Delete the whole game log?"))return;
+  S.log=[];saveLocal();renderLog()};
+ const addNote=()=>{const v=$("#noteText").value.trim();if(!v)return;
+  logEv("note","",v);$("#noteText").value=""};
+ $("#noteAdd").onclick=addNote;
+ $("#noteText").onkeydown=e=>{if(e.key==="Enter"){e.preventDefault();addNote()}};
+ $("#logClockOpt").checked=!!S.cfg.logClock;
+ $("#logClockOpt").onchange=e=>{S.cfg.logClock=e.target.checked;pushCfg()};
+ $("#logWrap").addEventListener("click",e=>{const b=e.target.closest("[data-logdel]");if(!b)return;
+  S.log.splice(parseInt(b.dataset.logdel),1);saveLocal();renderLog()});
+ document.addEventListener("keydown",e=>{
+  if(/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName))return;
+  if(e.code==="Space"){e.preventDefault();ac();toggleClock()}
+  if(e.key==="r"||e.key==="ㄱ"){e.preventDefault();act("replay")}
+  if(e.key==="q"||e.key==="ㅂ")act("score","home",1);
+  if(e.key==="w"||e.key==="ㅈ")act("score","away",1);
+ });
+}
+function copyTxt(s,btn){navigator.clipboard?navigator.clipboard.writeText(s):0;const o=btn.innerHTML;btn.innerHTML="✓";setTimeout(()=>btn.innerHTML=o,1200)}
+function urlFor(v){const base=location.origin+location.pathname;return `${base}?view=${v}&room=${ROOM}`}
+
+/* ================= setup ================= */
+function fillSetup(){
+ ["home","away"].forEach(k=>{const box=document.querySelector(`.body[data-team="${k}"]`),c=S.cfg[k];
+  box.querySelector('[data-f="name"]').value=c.name;
+  box.querySelector('[data-f="rec"]').value=c.rec;
+  box.querySelector('[data-f="bg"]').value=c.bg;box.querySelector('[data-f="bgt"]').value=c.bg;
+  box.querySelector('[data-f="fg"]').value=c.fg;box.querySelector('[data-f="fgt"]').value=c.fg;
+  const im=box.querySelector('[data-f="logoprev"]');im.src=c.logo||"data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==";
+ });
+ const b=S.cfg.board;
+ $$('input[name="layout"]').forEach(r=>r.checked=r.value===b.layout);
+ $("#boardBg").value=b.bg;$("#boardBgT").value=b.bg;$("#boardFg").value=b.fg;$("#boardFgT").value=b.fg;
+ buildFontSelects();
+ $("#fontSel").value=b.font||"__same";$("#fontKRSel").value=b.fontKR||"Black Han Sans";
+ $("#customFontUrl").value=b.customUrl||"";$("#fontWeightSel").value=String(b.weight||400);$("#fsVal").textContent=b.scale+"%";
+ $("#showTitle").checked=b.showTitle;$("#titleText").value=b.title;
+ $("#titleBg").value=b.titleBg;$("#titleBgT").value=b.titleBg;$("#titleFg").value=b.titleFg;$("#titleFgT").value=b.titleFg;
+ $("#optPeriod").checked=b.showPeriod;$("#optSOG").checked=b.showSOG;$("#optRec").checked=b.showRec;
+ $("#optPenTop").checked=b.penTop;$("#optPP").checked=b.pp;$("#optGoalH").checked=b.goalH;$("#optGoalA").checked=b.goalA;$("#optReplayDim").checked=b.replayDim!==false;
+ const tm=S.cfg.timer;
+ $("#showTimer").checked=tm.show;$("#countUp").checked=tm.countUp;$("#autoBuzz").checked=tm.autoBuzz;$("#penFreeze").checked=tm.penRealtime;
+ const tk=S.cfg.ticker;
+ $("#tickerText").value=tk.text;$("#tickerSpeed").value=tk.speed;
+ $("#tickerBg").value=tk.bg;$("#tickerBgT").value=tk.bg;$("#tickerFg").value=tk.fg;$("#tickerFgT").value=tk.fg;
+ $("#audioOn").checked=S.cfg.audio.on;$("#hornOn").checked=S.cfg.audio.horn;
+ $("#urlBug").value=urlFor("bug");$("#urlTicker").value=urlFor("ticker");$("#roomCode").value=ROOM;
+ renderPeriods();
+}
+function renderPeriods(){
+ $("#periodEditor").innerHTML=S.cfg.periods.map((p,i)=>`<div class="periodrow">
+  <span class="hint">${i+1}</span><input type="text" data-p="n" data-i="${i}" value="${esc(p.n)}">
+  <input type="text" data-p="len" data-i="${i}" value="${esc(p.len)}">
+  <button class="btn sm" data-p="del" data-i="${i}">✕</button></div>`).join("")}
+
+function bindSetup(){
+ ["home","away"].forEach(k=>{const box=document.querySelector(`.body[data-team="${k}"]`);
+  const set=(f,v)=>{S.cfg[k][f]=v;pushCfg()};
+  box.querySelector('[data-f="name"]').oninput=e=>set("name",e.target.value);
+  box.querySelector('[data-f="rec"]').oninput=e=>set("rec",e.target.value);
+  const bg=box.querySelector('[data-f="bg"]'),bgt=box.querySelector('[data-f="bgt"]');
+  bg.oninput=e=>{bgt.value=e.target.value;set("bg",e.target.value)};
+  bgt.onchange=e=>{bg.value=e.target.value;set("bg",e.target.value)};
+  const fg=box.querySelector('[data-f="fg"]'),fgt=box.querySelector('[data-f="fgt"]');
+  fg.oninput=e=>{fgt.value=e.target.value;set("fg",e.target.value)};
+  fgt.onchange=e=>{fg.value=e.target.value;set("fg",e.target.value)};
+  box.querySelector('[data-f="logofile"]').onchange=e=>{const f=e.target.files[0];if(!f)return;
+   shrink(f,256,d=>{S.cfg[k].logo=d;box.querySelector('[data-f="logoprev"]').src=d;pushCfg()})};
+  box.querySelector('[data-f="logodel"]').onclick=()=>{S.cfg[k].logo=null;fillSetup();pushCfg()};
+  box.querySelector('[data-f="logominus"]').onclick=()=>{S.cfg[k].logoSize=Math.max(30,S.cfg[k].logoSize-10);pushCfg()};
+  box.querySelector('[data-f="logoplus"]').onclick=()=>{S.cfg[k].logoSize=Math.min(250,S.cfg[k].logoSize+10);pushCfg()};
+  box.querySelector('[data-f="logoreset"]').onclick=()=>{S.cfg[k].logoSize=100;pushCfg()};
+  box.querySelector('[data-f="saveteam"]').onclick=()=>{const db=teamDB();
+   db[S.cfg[k].name||"team"]=JSON.parse(JSON.stringify(S.cfg[k]));
+   localStorage.setItem("htv_teams",JSON.stringify(db));
+   alert((LANG==="ko"?"저장했습니다: ":"Saved: ")+(S.cfg[k].name))};
+  box.querySelector('[data-f="loadteam"]').onclick=()=>{const el=box.querySelector('[data-f="teamlist"]');
+   const db=teamDB();const keys=Object.keys(db);
+   if(!keys.length){alert(LANG==="ko"?"저장된 팀이 없습니다.":"No saved teams.");return}
+   el.style.display=el.style.display==="none"?"block":"none";
+   el.innerHTML=keys.map(n=>`<div class="teamchip"><img src="${db[n].logo||""}"><span class="sp">${esc(n)}</span>
+     <button class="btn sm" data-tload="${esc(n)}" data-side="${k}">↓</button>
+     <button class="btn sm" data-tdel="${esc(n)}">✕</button></div>`).join("")};
+ });
+ document.addEventListener("click",e=>{
+  const l=e.target.closest("[data-tload]");
+  if(l){const db=teamDB();const d=db[l.dataset.tload];if(d){S.cfg[l.dataset.side]=JSON.parse(JSON.stringify(d));fillSetup();pushCfg()}return}
+  const d=e.target.closest("[data-tdel]");
+  if(d){const db=teamDB();delete db[d.dataset.tdel];localStorage.setItem("htv_teams",JSON.stringify(db));d.closest(".teamchip").remove()}
+ });
+ $("#btnFlip").onclick=()=>{const h=S.cfg.home;S.cfg.home=S.cfg.away;S.cfg.away=h;
+  const lh=S.live.home;S.live.home=S.live.away;S.live.away=lh;fillSetup();pubLive();pushCfg()};
+
+ $$('input[name="layout"]').forEach(r=>r.onchange=()=>{S.cfg.board.layout=r.value;pushCfg()});
+ pair("#boardBg","#boardBgT",v=>S.cfg.board.bg=v);
+ pair("#boardFg","#boardFgT",v=>S.cfg.board.fg=v);
+ pair("#titleBg","#titleBgT",v=>S.cfg.board.titleBg=v);
+ pair("#titleFg","#titleFgT",v=>S.cfg.board.titleFg=v);
+ pair("#tickerBg","#tickerBgT",v=>S.cfg.ticker.bg=v);
+ pair("#tickerFg","#tickerFgT",v=>S.cfg.ticker.fg=v);
+ $("#fontSel").onchange=e=>{S.cfg.board.font=e.target.value;pushCfg()};
+ $("#fontKRSel").onchange=e=>{S.cfg.board.fontKR=e.target.value;pushCfg()};
+ $("#fontWeightSel").onchange=e=>{S.cfg.board.weight=parseInt(e.target.value);pushCfg()};
+ $("#customFontUrl").onchange=e=>{S.cfg.board.customUrl=e.target.value.trim();addCustomOptions();applyCustomFont();pushCfg()};
+ $("#fsMinus").onclick=()=>{S.cfg.board.scale=Math.max(40,S.cfg.board.scale-5);$("#fsVal").textContent=S.cfg.board.scale+"%";pushCfg()};
+ $("#fsPlus").onclick=()=>{S.cfg.board.scale=Math.min(300,S.cfg.board.scale+5);$("#fsVal").textContent=S.cfg.board.scale+"%";pushCfg()};
+ $("#fsReset").onclick=()=>{S.cfg.board.scale=100;$("#fsVal").textContent="100%";pushCfg()};
+ $("#showTitle").onchange=e=>{S.cfg.board.showTitle=e.target.checked;pushCfg()};
+ $("#titleText").oninput=e=>{S.cfg.board.title=e.target.value;pushCfg()};
+ const cb=(id,fn)=>$(id).onchange=e=>{fn(e.target.checked);pushCfg()};
+ cb("#optPeriod",v=>S.cfg.board.showPeriod=v);cb("#optSOG",v=>S.cfg.board.showSOG=v);
+ cb("#optRec",v=>S.cfg.board.showRec=v);cb("#optPenTop",v=>S.cfg.board.penTop=v);
+ cb("#optPP",v=>S.cfg.board.pp=v);cb("#optGoalH",v=>S.cfg.board.goalH=v);cb("#optGoalA",v=>S.cfg.board.goalA=v);cb("#optReplayDim",v=>S.cfg.board.replayDim=v);
+ cb("#showTimer",v=>S.cfg.timer.show=v);cb("#autoBuzz",v=>S.cfg.timer.autoBuzz=v);cb("#penFreeze",v=>S.cfg.timer.penRealtime=v);
+ $("#countUp").onchange=e=>{clockCommit();S.cfg.timer.countUp=e.target.checked;
+  S.live.clock.ms=e.target.checked?0:parseTime(S.cfg.periods[S.live.pIdx].len);S.live.clock.at=now();pubLive();pushCfg()};
+ cb("#audioOn",v=>S.cfg.audio.on=v);cb("#hornOn",v=>S.cfg.audio.horn=v);
+ $("#tickerSpeed").oninput=e=>{S.cfg.ticker.speed=Math.max(5,parseInt(e.target.value||25));pushCfg()};
+ $("#hornFile").onchange=e=>{const f=e.target.files[0];if(!f)return;
+  if(f.size>1100000){alert(LANG==="ko"?"1MB 이하 파일만 가능합니다.":"File must be under 1MB");return}
+  const r=new FileReader();r.onload=()=>{S.cfg.audio.data=r.result;pushCfg()};r.readAsDataURL(f)};
+ $("#hornDel").onclick=()=>{S.cfg.audio.data=null;hornAudio=null;pushCfg()};
+ $("#addPeriod").onclick=()=>{S.cfg.periods.push({n:"P"+(S.cfg.periods.length+1),len:"20:00"});renderPeriods();pushCfg()};
+ $("#periodEditor").addEventListener("input",e=>{const el=e.target;if(!el.dataset.p)return;
+  const i=+el.dataset.i;if(el.dataset.p==="n")S.cfg.periods[i].n=el.value;else S.cfg.periods[i].len=el.value;pushCfg()});
+ $("#periodEditor").addEventListener("click",e=>{const el=e.target.closest('[data-p="del"]');if(!el)return;
+  if(S.cfg.periods.length<=1)return;S.cfg.periods.splice(+el.dataset.i,1);
+  S.live.pIdx=Math.min(S.live.pIdx,S.cfg.periods.length-1);renderPeriods();pubLive();pushCfg()});
+ $("#roomNew").onclick=()=>{if(!confirm(LANG==="ko"?"새 코드를 만들면 OBS 주소도 다시 넣어야 합니다. 계속할까요?":"Continue?"))return;
+  ROOM="htv"+rid()+rid();localStorage.setItem("htv_room",ROOM);location.href=location.pathname};
+ $("#roomCode").onchange=e=>{ROOM=e.target.value.trim()||ROOM;localStorage.setItem("htv_room",ROOM);location.href=location.pathname};
+ $("#btnExport").onclick=()=>{const blob=new Blob([JSON.stringify(S.cfg,null,1)],{type:"application/json"});
+  const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="hockeytv-scoreboard-config.json";a.click()};
+ $("#btnImport").onclick=()=>$("#importFile").click();
+ $("#importFile").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{S.cfg=JSON.parse(r.result);LANG=S.cfg.lang||"ko";applyI18N();fillSetup();pushCfg()}catch(x){alert("JSON error")}};r.readAsText(f)};
+}
+function pair(cid,tid,fn){const c=$(cid),x=$(tid);
+ c.oninput=e=>{x.value=e.target.value;fn(e.target.value);pushCfg()};
+ x.onchange=e=>{c.value=e.target.value;fn(e.target.value);pushCfg()}}
+const FONTS={
+ kr:[["Black Han Sans","검은고딕 Black Han Sans"],["Noto Sans KR","본고딕 Noto Sans KR"],["KotraBold","코트라 볼드체 KOTRA Bold"],["KotraDoYak","코트라 도약체"],
+     ["KotraHope","코트라 희망체"],["JalnanGothic","여기어때 잘난체 고딕"],["Jalnan","여기어때 잘난체"],
+     ["Gothic A1","고딕 A1"],["Do Hyeon","도현"],["Jua","주아"],
+     ["Nanum Gothic","나눔고딕"],["Song Myung","송명 (명조)"]],
+ en:[["Barlow Condensed","Barlow Condensed"],["Oswald","Oswald"],["Bebas Neue","Bebas Neue"],
+     ["Anton","Anton"],["Archivo Black","Archivo Black"],["Roboto Condensed","Roboto Condensed"]]};
+function buildFontSelects(){
+ const grp=(label,list)=>{const g=document.createElement("optgroup");g.label=label;
+  list.forEach(([v,n])=>{const o=document.createElement("option");o.value=v;o.textContent=n;
+   o.style.fontFamily=`'${v}','Noto Sans KR',sans-serif`;g.appendChild(o)});return g};
+ const L=LANG==="ko";
+ [["#fontSel",true],["#fontKRSel",false]].forEach(([id,same])=>{
+  const sel=$(id);if(!sel)return;const keep=sel.value;sel.innerHTML="";
+  if(same){const o=document.createElement("option");o.value="__same";
+   o.textContent=L?"↑ 한글 글꼴과 동일하게":"Same as Korean font";sel.appendChild(o)}
+  sel.appendChild(grp(L?"한글 글꼴":"Korean",FONTS.kr));
+  sel.appendChild(grp(L?"영문·숫자 전용":"Latin only",FONTS.en));
+  if(keep)sel.value=keep});
+ addCustomOptions()}
+function addCustomOptions(){const has=!!(S.cfg.board.customUrl||"").trim();
+ ["#fontSel","#fontKRSel"].forEach(id=>{const sel=$(id);if(!sel)return;
+  let o=sel.querySelector('option[value="CustomFont"]');
+  if(has&&!o){o=document.createElement("option");o.value="CustomFont";
+   o.textContent=LANG==="ko"?"직접 추가한 글꼴":"Custom font";sel.appendChild(o)}
+  else if(!has&&o)o.remove()})}
+function teamDB(){try{return JSON.parse(localStorage.getItem("htv_teams")||"{}")}catch(e){return{}}}
+function shrink(file,max,cb){const r=new FileReader();
+ r.onload=()=>{const im=new Image();im.onload=()=>{
+  let{width:w,height:h}=im;const s=Math.min(1,max/Math.max(w,h));w=Math.round(w*s);h=Math.round(h*s);
+  const cv=document.createElement("canvas");cv.width=w;cv.height=h;
+  cv.getContext("2d").drawImage(im,0,0,w,h);cb(cv.toDataURL("image/png"))};
+  im.onerror=()=>cb(r.result);im.src=r.result};
+ r.readAsDataURL(file)}
+
+boot();
+</script>
+</body>
+</html>
