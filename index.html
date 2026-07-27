@@ -40,9 +40,38 @@ button{font-family:inherit}
 #previewBody{background:#0d101c;padding:0;overflow:hidden}
 
 /* controls grid */
-.ctrlgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:10px}
-@media(max-width:1100px){.ctrlgrid{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:640px){.ctrlgrid{grid-template-columns:1fr}}
+.ctrlgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(152px,1fr));gap:8px;padding:8px}
+.ctrlgrid>.cbox{min-width:0}
+.cbox .subbtn,.cbox .tog,.cbox .bigbtn{white-space:normal;word-break:keep-all;line-height:1.25}
+.cbox .tag{word-break:keep-all}
+@media(max-width:430px){.ctrlgrid{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))}}
+/* 좁은 창(OBS 옆에 붙여놓고 쓸 때) — 네 칸이 모두 보이도록 촘촘하게 */
+@media(max-width:900px){
+ .topbar{padding:6px;gap:5px}
+ .btn{padding:5px 9px;font-size:12px}
+ .section{margin:6px}
+ .section>h3{padding:6px 9px;font-size:12px}
+ .section>.body{padding:8px}
+ .cbox>h4{padding:4px;font-size:11px}
+ .cbox>.b{padding:6px;gap:5px}
+ .tag{font-size:10px;padding:1px 7px}
+ .bigbtn{padding:9px;font-size:15px}
+ .subbtn{padding:6px;font-size:12px}
+ .tog{padding:7px;font-size:12px}
+ .clockbig{font-size:26px;letter-spacing:1px}
+ .hint{font-size:10px;line-height:1.4}
+ .penrow{font-size:11px;gap:2px;padding:3px 4px}
+ .penrow .ptime{font-size:13px;min-width:2.8em}
+ .penrow .pb{padding:2px 5px;font-size:10px}
+ .penadd{padding:6px;gap:5px}
+ .penadd .row4 button{padding:7px 1px;font-size:12px}
+ label.f{font-size:11px;margin:6px 0 2px}
+ input[type=text],input[type=number],select,textarea{padding:6px;font-size:12px}
+ .grid2,.grid3{grid-template-columns:1fr;gap:8px}
+ table.logtbl{font-size:11px}
+ table.logtbl th,table.logtbl td{padding:4px 5px}
+ .brow{grid-template-columns:auto 1fr auto;padding:6px 8px;font-size:12px}
+}
 .cbox{border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--panel)}
 .cbox>h4{margin:0;padding:6px;text-align:center;font-size:12px;font-weight:700;letter-spacing:.5px;background:#1a2033}
 .cbox>.b{padding:8px;display:flex;flex-direction:column;gap:6px}
@@ -811,7 +840,8 @@ function layoutFit(root){
  const st=root.querySelector("#fitStage");if(!st)return;
  let cw,ch;
  if(IS_DISPLAY){cw=window.innerWidth;ch=window.innerHeight}
- else{cw=root.clientWidth||960;ch=Math.min(cw*CANVAS_H/CANVAS_W,520)}
+ else{cw=root.clientWidth||960;const cap=window.innerWidth<900?Math.max(150,Math.round(window.innerHeight*0.26)):520;
+  ch=Math.min(cw*CANVAS_H/CANVAS_W,cap)}
  if(!cw||!ch)return;
  const sc=Math.min(cw/CANVAS_W,ch/CANVAS_H);
  st.style.transform=`translate(${Math.round((cw-CANVAS_W*sc)/2)}px,${Math.round((ch-CANVAS_H*sc)/2)}px) scale(${sc})`;
@@ -1171,8 +1201,12 @@ function bindControls(){
   if(S.log.length&&confirm(LANG==="ko"?"이전 경기 기록도 지울까요?\n[취소]를 누르면 기록은 그대로 남습니다.":"Clear the game log as well?")){S.log=[];logMemo=""}
   else if(S.log.length)logEv("reset","","");
   renderLog();push()};
- $("#btnTogglePrev").onclick=()=>{const b=$("#previewBody");const h=b.style.display==="none";
-  b.style.display=h?"block":"none";$("#btnTogglePrev").textContent=h?t("hide"):t("show")};
+ const setPrev=show=>{const b=$("#previewBody");b.style.display=show?"block":"none";
+  $("#btnTogglePrev").textContent=show?t("hide"):t("show");
+  try{localStorage.setItem("htv_prev",show?"1":"0")}catch(e){}
+  if(show)setTimeout(()=>{const r=$("#previewStage");if(r)layoutFit(r)},30)};
+ $("#btnTogglePrev").onclick=()=>setPrev($("#previewBody").style.display==="none");
+ if(localStorage.getItem("htv_prev")==="0")setPrev(false);
  $("#tickerText").oninput=e=>{S.cfg.ticker.text=e.target.value;pushCfg()};
  $("#logCsv").onclick=()=>{if(S.log.length)exportCSV()};
  $("#logTxt").onclick=exportTXT;
