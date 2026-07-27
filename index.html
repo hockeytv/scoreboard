@@ -447,6 +447,7 @@ table.logtbl tr:hover td{background:#1b2236}
       <div>
         <label class="sw"><input type="checkbox" id="optPeriod"><i></i><span data-i18n="optPeriod"></span></label>
         <label class="sw"><input type="checkbox" id="optSOG"><i></i><span data-i18n="optSOG"></span></label>
+        <input type="text" id="sogLabel" placeholder="SHOT" style="margin:2px 0 6px">
         <label class="sw"><input type="checkbox" id="optRec"><i></i><span data-i18n="optRec"></span></label>
         <label class="sw"><input type="checkbox" id="optPenTop"><i></i><span data-i18n="optPenTop"></span></label>
         <label class="sw"><input type="checkbox" id="optPP"><i></i><span data-i18n="optPP"></span></label>
@@ -514,7 +515,7 @@ table.logtbl tr:hover td{background:#1b2236}
 /* ================= i18n ================= */
 const I18N={
 ko:{openDisplay:"디스플레이 열기",copyBug:"OBS 스코어버그 주소 복사",copyTicker:"OBS 티커 주소 복사",resetGame:"경기 초기화",
-preview:"스코어보드 미리보기",hide:"숨기기",show:"보기",score:"점수",sog:"유효슛(SOG)",reset:"리셋",addPenalty:"페널티 추가",
+preview:"스코어보드 미리보기",hide:"숨기기",show:"보기",score:"점수",sog:"슈팅",reset:"리셋",addPenalty:"페널티 추가",
 activePenalties:"진행 중 페널티",emptyNet:"엠티넷",timeout:"타임아웃",timerBuzzer:"타이머 / 부저",start:"시작",pause:"일시정지",
 buzzer:"부저",goalHorn:"골혼 재생",timerHint:"페널티는 게임시계가 돌 때 함께 줄어듭니다. 스페이스바로 시작/정지.",
 gameStatus:"경기 상태",period:"피리어드",finalOff:"경기 종료 표시: 꺼짐",finalOn:"경기 종료 표시: 켜짐",
@@ -525,7 +526,7 @@ boardLayout:"보드 레이아웃",layBug:"스코어버그: 가로로 길게 (스
 layoutHint:"OBS 브라우저 소스에는 '스코어버그'를 쓰세요. 배경이 투명하게 나옵니다.\n소스 크기는 폭 1280 / 높이 260 정도로 시작하면 좋습니다.",
 boardAppearance:"보드 외형",boardBg:"보드 배경색",boardTxt:"보드 글자색",font:"영문·숫자 글꼴",fontSize:"글자 크기",
 showTitle:"제목 표시",titleBg:"제목 배경색",titleTxt:"제목 글자색",
-optPeriod:"피리어드 표시",optSOG:"SOG 표시",optRec:"전적/순위 표시",optPenTop:"페널티를 위쪽에 배치",optPP:"개별 페널티 대신 '파워플레이' 표시",
+optPeriod:"피리어드 표시",optSOG:"슈팅 수 표시 (라벨 직접 입력)",optRec:"전적/순위 표시",optPenTop:"페널티를 위쪽에 배치",optPP:"상대팀에 '파워플레이 + 남은시간' 표시 (끄면 반칙 선수 번호)",
 optGoalH:"홈 팀 골 애니메이션",optGoalA:"어웨이 팀 골 애니메이션",
 timerSettings:"타이머 설정",showTimer:"타이머 표시",countUp:"시간이 올라가게 (기본: 내려감)",autoBuzz:"0초에 자동 부저",penRealtime:"페널티를 게임시계와 무관하게 진행",
 periods:"피리어드 구성 (이름 / 길이)",addPeriod:"+ 피리어드 추가",periodHint:"대회마다 다른 피리어드 수·시간을 여기서 자유롭게 설정하세요. 시계가 멈춰 있을 때 피리어드를 바꾸면 시간이 자동으로 맞춰집니다.",
@@ -565,9 +566,9 @@ obsSize:"⚠ OBS 브라우저 소스 크기는 반드시 너비 1920 / 높이 10
 penNum:"선수 번호",penAddTitle:"페널티 추가",penCancel:"취소",penCustom:"직접 입력",penAdd:"추가",
 soPeriodWarn:"지금 피리어드(%s)의 길이가 0:00이라 시계가 0으로 리셋됩니다. 슛아웃 모드를 끄면 이전 피리어드와 시계로 돌아갑니다.",
 soRestored:"슛아웃 모드를 껐습니다. 이전 피리어드와 시계로 되돌렸습니다.",
-myBoard:"내 보드",sumScore:"최종 스코어",sumSOG:"유효슛",sumGoals:"득점",sumPens:"페널티",sumSO:"슛아웃",sumNotes:"메모",logCleared:"기록을 지웠습니다."},
+myBoard:"내 보드",sumScore:"최종 스코어",sumSOG:"슈팅",sumGoals:"득점",sumPens:"페널티",sumSO:"슛아웃",sumNotes:"메모",logCleared:"기록을 지웠습니다."},
 en:{openDisplay:"Open Display",copyBug:"Copy scorebug URL",copyTicker:"Copy ticker URL",resetGame:"Reset game",
-preview:"Scoreboard preview",hide:"Hide",show:"Show",score:"Score",sog:"SOG",reset:"Reset",addPenalty:"Add penalty",
+preview:"Scoreboard preview",hide:"Hide",show:"Show",score:"Score",sog:"Shots",reset:"Reset",addPenalty:"Add penalty",
 activePenalties:"Active penalties",emptyNet:"Empty net",timeout:"Timeout",timerBuzzer:"Timer and Buzzer",start:"Start",pause:"Pause",
 buzzer:"Buzzer",goalHorn:"Goal horn",timerHint:"Penalties tick down with the game clock. Press Space to start/stop.",
 gameStatus:"Game Status",period:"Period",finalOff:"Final: Off",finalOn:"Final: On",
@@ -578,7 +579,7 @@ boardLayout:"Board Layout",layBug:"Scorebug: narrow and wide",layBugC:"Scorebug:
 layoutHint:"Use the scorebug for OBS browser sources — the background is transparent.\nStart with a source size of about 1280 x 260.",
 boardAppearance:"Board appearance",boardBg:"Board background",boardTxt:"Board text",font:"Latin / number font",fontSize:"Font size",
 showTitle:"Show a title",titleBg:"Title background",titleTxt:"Title text",
-optPeriod:'Show period',optSOG:'Show "SOG"',optRec:"Show team records",optPenTop:"Penalties on top",optPP:'Show "Power play" instead of penalties',
+optPeriod:'Show period',optSOG:'Show shot count',optRec:"Show team records",optPenTop:"Penalties on top",optPP:'Show "Power play + time" on the other team',
 optGoalH:"Goal animation for Home",optGoalA:"Goal animation for Away",
 timerSettings:"Timer settings",showTimer:"Show timer",countUp:"Timer counts up",autoBuzz:"Auto buzzer at 0",penRealtime:"Penalties run independently of clock",
 periods:"Periods (name / length)",addPeriod:"+ Add period",periodHint:"Set any number of periods and lengths. Changing period while stopped resets the clock to that period's length.",
@@ -631,11 +632,11 @@ const DEFAULT={
  cfg:{home:team("HOME","#131a33","#f5c518"),away:team("AWAY","#c01722","#ffffff"),
   board:{layout:"bug",bg:"#131a33",fg:"#ffffff",font:"__same",fontKR:"Black Han Sans",customUrl:"",weight:400,scale:100,
    showTitle:false,title:"",titleBg:"#131a33",titleFg:"#ffffff",
-   showPeriod:true,showSOG:true,showRec:true,penTop:false,pp:false,goalH:true,goalA:true,replayDim:true,pos:"tl",margin:40,lang:"en"},
+   showPeriod:true,showSOG:true,showRec:true,penTop:false,pp:true,sogLabel:"SHOT",goalH:true,goalA:true,replayDim:true,pos:"tl",margin:40,lang:"en"},
   timer:{show:true,countUp:false,autoBuzz:false,penRealtime:false},
   periods:JSON.parse(JSON.stringify(DEF_PERIODS)),
   ticker:{text:"",speed:25,bg:"#131a33",fg:"#ffffff"},
-  audio:{on:true,horn:true,data:null},logClock:false,lang:"ko",fv:3},
+  audio:{on:true,horn:true,data:null},logClock:false,lang:"ko",fv:4},
  live:{home:liveTeam(),away:liveTeam(),clock:{ms:1200000,running:false,at:0},
   pIdx:0,final:false,tickerOn:false,shootout:false,replay:false,fx:{buzz:0,horn:0},rev:0}};
 let S=JSON.parse(JSON.stringify(DEFAULT));
@@ -729,6 +730,7 @@ function saveLocal(){try{localStorage.setItem("htv_state",JSON.stringify(S))}cat
 function loadLocal(){try{const r=localStorage.getItem("htv_state");if(!r)return;
  const d=JSON.parse(r);S.cfg=Object.assign(S.cfg,d.cfg||{});
  if(((d.cfg||{}).fv|0)<3){S.cfg.board.font="__same";S.cfg.board.fontKR="Black Han Sans";S.cfg.board.weight=400;S.cfg.fv=3}
+ if(((d.cfg||{}).fv|0)<4){S.cfg.board.pp=true;S.cfg.board.sogLabel="SHOT";S.cfg.fv=4}
  if(d.live){S.live=Object.assign(S.live,d.live);S.live.clock.running=false}
  if(Array.isArray(d.log))S.log=d.log;
  LANG=S.cfg.lang||"ko"}catch(e){}}
@@ -763,7 +765,7 @@ function sideHTML(k,row){const c=S.cfg[k],l=S.live[k],b=S.cfg.board;
  const gc=k==="home"?1:2;
  const logo=c.logo?`<img class="sblogo" style="height:${2.15*(c.logoSize/100)}em;width:${2.15*(c.logoSize/100)}em" src="${c.logo}">`:"";
  const rec=(b.showRec&&c.rec)?`<div class="sbrec">(${esc(c.rec)})</div>`:"";
- const sog=b.showSOG?`<div class="sbsog">${t("sog")==="SOG"?"SOG":"SOG"} ${l.sog}</div>`:"";
+ const sog=b.showSOG?`<div class="sbsog">${esc(b.sogLabel||"SHOT")} ${l.sog}</div>`:"";
  return `<div class="sbside" style="background:${c.bg};color:${c.fg};grid-row:${row};grid-column:${gc}">
    ${logo}<div class="sbnamecol"><div class="sbname">${esc(c.name)}</div>${rec}</div>
    <div class="sbscorecol"><div class="sbscore">${l.score}</div>${sog}</div></div>`}
@@ -813,7 +815,7 @@ function bugHTML(){const b=S.cfg.board,tm=S.cfg.timer,L=S.live;
 function fullHTML(){const b=S.cfg.board,tm=S.cfg.timer;
  const T=k=>{const c=S.cfg[k],l=S.live[k];return `<div class="fsbteam" style="background:${c.bg};color:${c.fg}">
    <div class="n">${esc(c.name)}</div><div class="s">${l.score}</div>
-   ${b.showSOG?`<div class="sbsog">SOG ${l.sog}</div>`:""}</div>`};
+   ${b.showSOG?`<div class="sbsog">${esc(b.sogLabel||"SHOT")} ${l.sog}</div>`:""}</div>`};
  const pens=["home","away"].map(k=>activePen(k).map(p=>`<span style="color:${S.cfg[k].fg};background:${S.cfg[k].bg};padding:.1em .4em;border-radius:4px;margin:0 .2em">${esc(p.num)} ${fmt(penLive(p))}</span>`).join("")).join("");
  return `<div class="fsb" style="--sbfont:${fontStack()};--sbw:${b.weight||400};font-size:${18*b.scale/100}px;background:${b.bg};color:${b.fg};padding:.6em 1em;border-radius:8px">
   ${b.showTitle&&b.title?`<div style="font-size:1.6em;font-weight:700">${esc(b.title)}</div>`:""}
@@ -1259,7 +1261,7 @@ function fillSetup(){
  $("#customFontUrl").value=b.customUrl||"";$("#boardLangSel").value=b.lang||"en";$("#fontWeightSel").value=String(b.weight||400);$("#fsVal").textContent=b.scale+"%";
  $("#showTitle").checked=b.showTitle;$("#titleText").value=b.title;
  $("#titleBg").value=b.titleBg;$("#titleBgT").value=b.titleBg;$("#titleFg").value=b.titleFg;$("#titleFgT").value=b.titleFg;
- $("#optPeriod").checked=b.showPeriod;$("#optSOG").checked=b.showSOG;$("#optRec").checked=b.showRec;
+ $("#optPeriod").checked=b.showPeriod;$("#optSOG").checked=b.showSOG;$("#sogLabel").value=b.sogLabel||"SHOT";$("#optRec").checked=b.showRec;
  $("#optPenTop").checked=b.penTop;$("#optPP").checked=b.pp;$("#optGoalH").checked=b.goalH;$("#optGoalA").checked=b.goalA;$("#optReplayDim").checked=b.replayDim!==false;
  const tm=S.cfg.timer;
  $("#showTimer").checked=tm.show;$("#countUp").checked=tm.countUp;$("#autoBuzz").checked=tm.autoBuzz;$("#penFreeze").checked=tm.penRealtime;
@@ -1336,6 +1338,7 @@ function bindSetup(){
  $("#titleText").oninput=e=>{S.cfg.board.title=e.target.value;pushCfg()};
  const cb=(id,fn)=>$(id).onchange=e=>{fn(e.target.checked);pushCfg()};
  cb("#optPeriod",v=>S.cfg.board.showPeriod=v);cb("#optSOG",v=>S.cfg.board.showSOG=v);
+ $("#sogLabel").oninput=e=>{S.cfg.board.sogLabel=e.target.value.trim()||"SHOT";pushCfg()};
  cb("#optRec",v=>S.cfg.board.showRec=v);cb("#optPenTop",v=>S.cfg.board.penTop=v);
  cb("#optPP",v=>S.cfg.board.pp=v);cb("#optGoalH",v=>S.cfg.board.goalH=v);cb("#optGoalA",v=>S.cfg.board.goalA=v);cb("#optReplayDim",v=>S.cfg.board.replayDim=v);
  cb("#showTimer",v=>S.cfg.timer.show=v);cb("#autoBuzz",v=>S.cfg.timer.autoBuzz=v);$("#penFreeze").onchange=e=>{penCommit();S.cfg.timer.penRealtime=e.target.checked;penCommit();pubLive();pushCfg()};
